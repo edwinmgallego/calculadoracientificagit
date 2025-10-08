@@ -13,11 +13,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.swing.JDialog;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -36,6 +41,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private String operador;
     private boolean nuevoInput; // Para controlar si se debe limpiar la pantalla
 
+    // Historial
+    private DefaultListModel<String> historyModel;
+    private JList<String> historyList;
+    private JDialog dialogHistorial;
+    private JButton btnHist;
+    private static final int HISTORY_LIMIT = 100;
+
     public CalculadoraCientificaFuncional() {
         // --- Configuración de la Ventana (JFrame) ---
         setTitle("Calculadora Científica Funcional");
@@ -53,7 +65,17 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         display.setForeground(new Color(50, 255, 50)); // Verde lima
         display.setHorizontalAlignment(JTextField.RIGHT);
         display.setFont(new Font("Monospaced", Font.BOLD, 40));
-        panelPrincipal.add(display, BorderLayout.NORTH);
+
+        // Panel superior: display + botón Hist
+        JPanel northPanel = new JPanel(new BorderLayout(5,5));
+        northPanel.add(display, BorderLayout.CENTER);
+        btnHist = new JButton("Hist");
+        btnHist.setFont(new Font("Arial", Font.BOLD, 12));
+        btnHist.addActionListener((ActionEvent e) -> {
+            dialogHistorial.setVisible(true);
+        });
+        northPanel.add(btnHist, BorderLayout.EAST);
+        panelPrincipal.add(northPanel, BorderLayout.NORTH);
 
 // --- Panel de Botones ---
         JPanel panelBotones = new JPanel(new GridLayout(7, 6, 5, 5));
@@ -83,6 +105,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
             if (textoBoton.equals("=")) {
                 boton.setBackground(new Color(0, 150, 0));
+                boton.setForeground(Color.WHITE);
+            } else if (textoBoton.matches("C|CE")) {
                 boton.setForeground(Color.BLACK);
             } else if (textoBoton.matches("[C]|CE")) {
                 boton.setBackground(new Color(200, 50, 50));
@@ -99,6 +123,30 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         // Inicializamos las variables de estado
         nuevoInput = true;
         operador = "";
+
+        // Inicializar historial (modelo + dialog)
+        initHistorial();
+    }
+
+    private void initHistorial() {
+        historyModel = new DefaultListModel<>();
+        historyList = new JList<>(historyModel);
+
+        dialogHistorial = new JDialog(this, "Historial de Operaciones", false);
+        dialogHistorial.setSize(420, 480);
+        dialogHistorial.setLocationRelativeTo(this);
+        dialogHistorial.setLayout(new BorderLayout(5,5));
+        dialogHistorial.add(new JScrollPane(historyList), BorderLayout.CENTER);
+
+        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnLimpiar = new JButton("Limpiar");
+        btnLimpiar.addActionListener(e -> historyModel.clear());
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.addActionListener(e -> dialogHistorial.setVisible(false));
+        panelSur.add(btnLimpiar);
+        panelSur.add(btnCerrar);
+
+        dialogHistorial.add(panelSur, BorderLayout.SOUTH);
     }
 
     @Override
@@ -136,14 +184,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
 
                 // --- Operadores Binarios (+, -, *, /, %, x^y, x√y) ---
-                case "+":
-                case "-":
-                case "*":
-                case "/":
-                case "%":
-                case "xʸ":
-                case "x√y":
-                    calcular();
+                case "+": case "-": case "*": case "/": case "%":
+                case "xʸ": case "x√y":
+                    calcular(); // resuelve operación pendiente antes de cambiar el operador
                     operador = comando;
                     primerNumero = Double.parseDouble(display.getText());
                     nuevoInput = true;
@@ -156,71 +199,145 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
 
                 // --- Operadores Unarios (operan sobre el número actual) ---
-                case "√":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    display.setText(String.valueOf(Math.sqrt(primerNumero)));
+                case "√": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.sqrt(in);
+                    display.setText(formatNumber(res));
+                    addToHistory("√(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "∛":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    display.setText(String.valueOf(Math.cbrt(primerNumero)));
+                }
+                case "∛": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.cbrt(in);
+                    display.setText(formatNumber(res));
+                    addToHistory("∛(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "x²": // Este no estaba en la lista pero es común, lo añado como ejemplo
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    display.setText(String.valueOf(primerNumero * primerNumero));
+                }
+                case "x²": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = in * in;
+                    display.setText(formatNumber(res));
+                    addToHistory(formatNumber(in) + "² = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "1/x":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    if (primerNumero == 0) {
+                }
+                case "1/x": {
+                    double in = Double.parseDouble(textoDisplay);
+                    if (in == 0) {
                         display.setText("Error: División por cero");
+                        nuevoInput = true;
                     } else {
-                        display.setText(String.valueOf(1 / primerNumero));
+                        double res = 1.0 / in;
+                        display.setText(formatNumber(res));
+                        addToHistory("1/(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
                     }
                     break;
-                case "±":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    display.setText(String.valueOf(-primerNumero));
+                }
+                case "±": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = -in;
+                    display.setText(formatNumber(res));
+                    addToHistory("±(" + formatNumber(in) + ") = " + formatNumber(res));
                     break;
-                case "n!":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    if (primerNumero >= 0 && primerNumero == (int) primerNumero) {
-                        display.setText(String.valueOf(factorial((int) primerNumero)));
+                }
+                case "n!": {
+                    double in = Double.parseDouble(textoDisplay);
+                    if (in >= 0 && in == (int) in && in <= 20) {
+                        long fact = factorial((int) in);
+                        display.setText(String.valueOf(fact));
+                        addToHistory((int) in + "! = " + fact);
                     } else {
-                        display.setText("Error: n! solo para enteros >= 0");
+                        display.setText("Error: n! solo para enteros >= 0 (<=20)");
                     }
+                    nuevoInput = true;
                     break;
+                }
                 // --- Logaritmos y Exponenciales ---
-                case "ln":
-                    display.setText(String.valueOf(Math.log(Double.parseDouble(textoDisplay))));
+                case "ln": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.log(in);
+                    display.setText(formatNumber(res));
+                    addToHistory("ln(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "log":
-                    display.setText(String.valueOf(Math.log10(Double.parseDouble(textoDisplay))));
+                }
+                case "log": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.log10(in);
+                    display.setText(formatNumber(res));
+                    addToHistory("log(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "eˣ":
-                    display.setText(String.valueOf(Math.exp(Double.parseDouble(textoDisplay))));
+                }
+                case "eˣ": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.exp(in);
+                    display.setText(formatNumber(res));
+                    addToHistory("e^(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "10ˣ":
-                    display.setText(String.valueOf(Math.pow(10, Double.parseDouble(textoDisplay))));
+                }
+                case "10ˣ": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.pow(10, in);
+                    display.setText(formatNumber(res));
+                    addToHistory("10^(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
+                }
 
-                // --- Trigonométricas (en radianes) ---
-                case "sin":
-                    display.setText(String.valueOf(Math.sin(Math.toRadians(Double.parseDouble(textoDisplay)))));
+                // --- Trigonométricas (usamos entrada en grados por usabilidad) ---
+                case "sin": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.sin(Math.toRadians(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("sin(" + formatNumber(in) + "°) = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "cos":
-                    display.setText(String.valueOf(Math.cos(Math.toRadians(Double.parseDouble(textoDisplay)))));
+                }
+                case "cos": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.cos(Math.toRadians(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("cos(" + formatNumber(in) + "°) = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "tan":
-                    display.setText(String.valueOf(Math.tan(Math.toRadians(Double.parseDouble(textoDisplay)))));
+                }
+                case "tan": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.tan(Math.toRadians(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("tan(" + formatNumber(in) + "°) = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
-                case "asin":
-                    display.setText(String.valueOf(Math.toDegrees(Math.asin(Double.parseDouble(textoDisplay)))));
+                }
+                case "asin": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.toDegrees(Math.asin(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    nuevoInput = true;
                     break;
-                case "acos":
-                    display.setText(String.valueOf(Math.toDegrees(Math.acos(Double.parseDouble(textoDisplay)))));
+                }
+                case "acos": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.toDegrees(Math.acos(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    nuevoInput = true;
                     break;
-                case "atan":
-                    display.setText(String.valueOf(Math.toDegrees(Math.atan(Double.parseDouble(textoDisplay)))));
+                }
+                case "atan": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.toDegrees(Math.atan(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    nuevoInput = true;
                     break;
+                }
 
                 // --- Control ---
                 case "C":
@@ -280,6 +397,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             case "/":
                 if (segundoNumero == 0) {
                     display.setText("Error: División por cero");
+                    nuevoInput = true;
                     return;
                 }
                 resultado = primerNumero / segundoNumero;
@@ -295,12 +413,12 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 break;
         }
 
+        // Guardar en historial (antes de cambiar primerNumero)
+        String entradaHistorial = formatNumber(primerNumero) + " " + operador + " " + formatNumber(segundoNumero) + " = " + formatNumber(resultado);
+        addToHistory(entradaHistorial);
+
         // Formateamos para no mostrar ".0" en números enteros
-        if (resultado == (long) resultado) {
-            display.setText(String.format("%d", (long) resultado));
-        } else {
-            display.setText(String.format("%s", resultado));
-        }
+        display.setText(formatNumber(resultado));
 
         primerNumero = resultado; // Permite encadenar operaciones
         nuevoInput = true;
@@ -317,6 +435,24 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         return fact;
     }
 
+    private void addToHistory(String entry) {
+        if (historyModel == null) return;
+        if (historyModel.getSize() >= HISTORY_LIMIT) {
+            historyModel.remove(0);
+        }
+        historyModel.addElement(entry);
+    }
+
+    private String formatNumber(double val) {
+        if (Double.isNaN(val)) return "NaN";
+        if (Double.isInfinite(val)) return val > 0 ? "Infinity" : "-Infinity";
+        if (val == (long) val) {
+            return String.format("%d", (long) val);
+        } else {
+            return String.valueOf(val);
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
@@ -328,11 +464,3 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         });
     }
 }
-
-
-/*
-sadkjfa
- 
- 
- 
- */
