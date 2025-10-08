@@ -20,7 +20,7 @@ public class ArcoCoseno {
         this.primerNumero = primerNumero;
     }
 
-    public double calcularArcoCoseno() {
+    public static double calcularArcoCoseno(double primerNumero) {
         if (primerNumero < -1 || primerNumero > 1) {
             throw new IllegalArgumentException("El valor debe estar entre -1 y 1");
         }
