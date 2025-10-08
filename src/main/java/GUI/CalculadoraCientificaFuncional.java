@@ -82,10 +82,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
             if (textoBoton.equals("=")) {
                 boton.setBackground(new Color(0, 150, 0));
-                boton.setForeground(Color.WHITE);
+                boton.setForeground(Color.BLACK);
             } else if (textoBoton.matches("[C]|CE")) {
                 boton.setBackground(new Color(200, 50, 50));
-                boton.setForeground(Color.WHITE);
+                boton.setForeground(Color.BLACK);
             } else if (textoBoton.matches("[\\+\\-*%/]")) {
                 boton.setBackground(new Color(240, 240, 240));
             }
