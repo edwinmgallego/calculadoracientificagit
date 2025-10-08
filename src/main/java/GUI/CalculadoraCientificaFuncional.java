@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import Modelo.*;
 
 /**
  * Clase que crea la interfaz y la funcionalidad de una calculadora científica.
@@ -53,17 +54,25 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         display.setFont(new Font("Monospaced", Font.BOLD, 40));
         panelPrincipal.add(display, BorderLayout.NORTH);
 
-        // --- Panel de Botones ---
-        JPanel panelBotones = new JPanel(new GridLayout(6, 6, 5, 5));
+// --- Panel de Botones ---
+        JPanel panelBotones = new JPanel(new GridLayout(7, 6, 5, 5));
 
-        // Etiquetas de los botones según las funciones solicitadas
+// --- Etiquetas de los botones según las funciones solicitadas ---
         String[] botones = {
+            // Fila 1 - Trigonométricas
             "sin", "cos", "tan", "asin", "acos", "atan",
-            "xʸ", "√", "∛", "x√y", "ln", "log",
-            "eˣ", "10ˣ", "1/x", "n!", "%", "C",
-            "7", "8", "9", "/", "CE", "±",
-            "4", "5", "6", "*", "1", "2",
-            "3", "-", "0", ".", "=", "+"
+            // Fila 2 - Hiperbólicas
+            "sinh", "cosh", "tanh", "ln", "log", "eˣ",
+            // Fila 3 - Potencias y raíces
+            "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
+            // Fila 4 - Factorial, porcentaje y clear
+            "n!", "%", "C", "CE", "±", "/",
+            // Fila 5 - Números 7 8 9
+            "7", "8", "9", "*", "(", ")",
+            // Fila 6 - Números 4 5 6
+            "4", "5", "6", "-", " ", " ",
+            // Fila 7 - Números 1 2 3 0 . =
+            "1", "2", "3", "+", "0", "."
         };
 
         for (String textoBoton : botones) {
@@ -99,8 +108,16 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         try {
             switch (comando) {
                 // --- Números ---
-                case "0": case "1": case "2": case "3": case "4":
-                case "5": case "6": case "7": case "8": case "9":
+                case "0":
+                case "1":
+                case "2":
+                case "3":
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                case "8":
+                case "9":
                     if (nuevoInput) {
                         display.setText(comando);
                         nuevoInput = false;
@@ -118,8 +135,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
 
                 // --- Operadores Binarios (+, -, *, /, %, x^y, x√y) ---
-                case "+": case "-": case "*": case "/": case "%":
-                case "xʸ": case "x√y":
+                case "+":
+                case "-":
+                case "*":
+                case "/":
+                case "%":
+                case "xʸ":
+                case "x√y":
                     calcular();
                     operador = comando;
                     primerNumero = Double.parseDouble(display.getText());
@@ -138,7 +160,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(Math.sqrt(primerNumero)));
                     break;
                 case "∛":
-                     primerNumero = Double.parseDouble(textoDisplay);
+                    primerNumero = Double.parseDouble(textoDisplay);
                     display.setText(String.valueOf(Math.cbrt(primerNumero)));
                     break;
                 case "x²": // Este no estaba en la lista pero es común, lo añado como ejemplo
@@ -176,7 +198,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(Math.exp(Double.parseDouble(textoDisplay))));
                     break;
                 case "10ˣ":
-                     display.setText(String.valueOf(Math.pow(10, Double.parseDouble(textoDisplay))));
+                    display.setText(String.valueOf(Math.pow(10, Double.parseDouble(textoDisplay))));
                     break;
 
                 // --- Trigonométricas (en radianes) ---
@@ -209,6 +231,23 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 case "CE":
                     display.setText("0");
                     nuevoInput = true;
+                    break;
+
+                // --- Funciones hiperbólicas ---
+                case "sinh":
+                    primerNumero = Double.parseDouble(textoDisplay);
+                    FuncHiperb f1 = new FuncHiperb(primerNumero, 1);
+                    display.setText(String.valueOf(f1.getOutput()));
+                    break;
+                case "cosh":
+                    primerNumero = Double.parseDouble(textoDisplay);
+                    FuncHiperb f2 = new FuncHiperb(primerNumero, 2);
+                    display.setText(String.valueOf(f2.getOutput()));
+                    break;
+                case "tanh":
+                    primerNumero = Double.parseDouble(textoDisplay);
+                    FuncHiperb f3 = new FuncHiperb(primerNumero, 3);
+                    display.setText(String.valueOf(f3.getOutput()));
                     break;
             }
         } catch (NumberFormatException ex) {
@@ -248,7 +287,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             case "xʸ":
                 resultado = Math.pow(primerNumero, segundoNumero);
                 break;
-             case "x√y":
+            case "x√y":
                 resultado = Math.pow(primerNumero, 1.0 / segundoNumero);
                 break;
         }
@@ -259,20 +298,21 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         } else {
             display.setText(String.format("%s", resultado));
         }
-        
+
         primerNumero = resultado; // Permite encadenar operaciones
         nuevoInput = true;
     }
-    
+
     private long factorial(int n) {
-        if (n > 20) return -1; // Evitar overflow de tipo long
+        if (n > 20) {
+            return -1; // Evitar overflow de tipo long
+        }
         long fact = 1;
         for (int i = 2; i <= n; i++) {
             fact = fact * i;
         }
         return fact;
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
