@@ -21,7 +21,9 @@ public class ArcoCoseno {
     }
 
     public double calcularArcoCoseno() {
+        if (primerNumero < -1 || primerNumero > 1) {
+            throw new IllegalArgumentException("El valor debe estar entre -1 y 1");
+        }
         return Math.acos(primerNumero);
     }
 }
-
