@@ -9,5 +9,5 @@ package Modelo;
  * @author USUARIO
  */
 public class Restar {
-    
+    private int NuevaVariable;
 }
