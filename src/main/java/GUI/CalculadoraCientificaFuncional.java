@@ -8,6 +8,7 @@ package GUI;
  *
  * @author cript
  */
+import Modelo.RetrocesUltimoDigito;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -66,7 +67,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             // Fila 3 - Potencias y raíces
             "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
             // Fila 4 - Factorial, porcentaje y clear
-            "n!", "%", "C", "CE", "±", "/",
+            "n!", "%", "C", "CE","<-" , "±", "/",
             // Fila 5 - Números 7 8 9
             "7", "8", "9", "*", "(", ")",
             // Fila 6 - Números 4 5 6
@@ -232,6 +233,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText("0");
                     nuevoInput = true;
                     break;
+                case "<-":
+                    display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
 
                 // --- Funciones hiperbólicas ---
                 case "sinh":
