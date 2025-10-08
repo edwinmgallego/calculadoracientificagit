@@ -29,5 +29,13 @@ public class Resta {
     public void setSegundoNumero(double segundoNumero) {
         this.segundoNumero = segundoNumero;
     }
+    public double calcular() {
+        resultado = primerNumero - segundoNumero;
+        return resultado;
+    }
 
+    public double getResultado() {
+        return resultado;
+    }
 }
+
