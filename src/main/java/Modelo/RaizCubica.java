@@ -6,11 +6,11 @@ package Modelo;
 
 /**
  *
- * @author Angello
+ * @author migue
  */
-public class RaizCuadrada {
+public class RaizCubica {
+    
     private double primerNumero;
-    private double resultado;
 
     public double getPrimerNumero() {
         return primerNumero;
@@ -19,19 +19,9 @@ public class RaizCuadrada {
     public void setPrimerNumero(double primerNumero) {
         this.primerNumero = primerNumero;
     }
-
-    public double getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(double resultado) {
-        this.resultado = resultado;
-    }
     
-    public double raiz(double primerNumero){
-        
-        resultado = Math.sqrt(primerNumero);
-        
-        return resultado;
+    public double raizCubica(){
+    
+    return Math.sqrt(primerNumero);
     }
 }
