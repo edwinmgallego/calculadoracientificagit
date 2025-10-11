@@ -15,8 +15,10 @@ public class Exponencial {
     private double resultado;
     private double segundoNumero;
     
-    public void Expocinencial() {
+    public double Expocinencial(double primerNumero, double segundoNumero) {
         resultado = Math.pow (primerNumero,segundoNumero);
+        
+        return resultado;
     }
     
 }
