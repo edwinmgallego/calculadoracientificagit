@@ -21,7 +21,7 @@ public class FuncionTangente {
     }
 
     public double calcularTangente() {
-        //Validación
+        //Validacion donde la tangente no está definida
         if ((primerNumero - 90) % 180 == 0) {
             System.out.println("Error: La tangente no está definida para " + primerNumero + "°");
             return Double.NaN; // Retorna error
