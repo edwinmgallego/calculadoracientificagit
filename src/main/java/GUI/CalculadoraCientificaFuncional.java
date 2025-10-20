@@ -379,6 +379,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText("0");
                     nuevoInput = true;
                     break;
+                //se solucionó un problema que había con el del
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
                     nuevoInput = false;
