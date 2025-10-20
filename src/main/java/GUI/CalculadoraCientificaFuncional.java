@@ -350,9 +350,15 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 case "acos": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.toDegrees(Math.acos(in));
-                    display.setText(formatNumber(res));
-                    addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    double res;
+                    ArcoCoseno arcocoseno = new ArcoCoseno();
+                    if (in < -1 || in > 1) {
+                        display.setText("MathERROR");
+                    } else{
+                        res = arcocoseno.calcularArcoCoseno(in);
+                        display.setText(formatNumber(res));
+                        addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    }
                     nuevoInput = true;
                     break;
                 }
