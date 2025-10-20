@@ -8,7 +8,6 @@ package GUI;
  *
  * @author cript
  */
-import Suma.Suma;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -34,7 +33,6 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private double primerNumero;
     private String operador;
     private boolean nuevoInput; // Para controlar si se debe limpiar la pantalla
-    public Suma app= new Suma();
 
     public CalculadoraCientificaFuncional() {
         // --- Configuración de la Ventana (JFrame) ---
@@ -75,10 +73,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
             if (textoBoton.equals("=")) {
                 boton.setBackground(new Color(0, 150, 0));
-                boton.setForeground(Color.BLACK);
+                boton.setForeground(Color.WHITE);
             } else if (textoBoton.matches("[C]|CE")) {
                 boton.setBackground(new Color(200, 50, 50));
-                boton.setForeground(Color.BLACK);
+                boton.setForeground(Color.WHITE);
             } else if (textoBoton.matches("[\\+\\-*%/]")) {
                 boton.setBackground(new Color(240, 240, 240));
             }
@@ -229,7 +227,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
         switch (operador) {
             case "+":
-                resultado = app.sumar(primerNumero, segundoNumero);
+                resultado = primerNumero + segundoNumero;
                 break;
             case "-":
                 resultado = primerNumero - segundoNumero;
