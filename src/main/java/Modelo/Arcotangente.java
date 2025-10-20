@@ -2,13 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package prueba;
+package Modelo;
 
 /**
  *
- * @author emgallego
+ * @author Jonatan
  */
-public class prueba {
+public class Arcotangente {
     
-   // System.out.println("hola");
+   
+    public double calcular(double valor) {
+        return Math.atan(valor);
+    }
+
+    
 }
