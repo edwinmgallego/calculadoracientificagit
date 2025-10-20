@@ -305,8 +305,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "tan": {
+                    
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.tan(Math.toRadians(in));
+                    FuncionTangente tan = new FuncionTangente(in);
+                    double res = tan.calcularTangente();
                     display.setText(formatNumber(res));
                     addToHistory("tan(" + formatNumber(in) + "°) = " + formatNumber(res));
                     nuevoInput = true;
