@@ -381,6 +381,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
+                    nuevoInput = false;
+                    break;
 
                 // --- Funciones hiperbólicas ---
                 case "sinh":
