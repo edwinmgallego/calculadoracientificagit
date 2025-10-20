@@ -364,11 +364,12 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 case "atan": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.toDegrees(Math.atan(in));
-                    display.setText(formatNumber(res));
-                    addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
-                    nuevoInput = true;
-                    break;
+                     Arcotangente arcotangente = new Arcotangente();
+                     double res = Math.toDegrees(arcotangente.calcularArcotangente(in));
+                     display.setText(formatNumber(res));
+                     addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                     nuevoInput = true;
+                     break;
                 }
 
                 // --- Paréntesis ---

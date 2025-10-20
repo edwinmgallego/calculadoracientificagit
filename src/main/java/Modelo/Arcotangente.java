@@ -10,28 +10,7 @@ package Modelo;
  */
 public class Arcotangente {
     
-    private double valor;
-
-    public Arcotangente() {}
-
-    public Arcotangente(double valor) {
-        this.valor = valor;
-    }
-
-    public double getValor() {
-        return valor;
-    }
-
-    public void setValor(double valor) {
-        this.valor = valor;
-    }
-
-    public double calcular() {
+     public static double calcularArcotangente(double valor) {
         return Math.atan(valor);
     }
-
-    public static double calcularArcotangente(double valor) {
-        return Math.atan(valor);
-    }
-    
 }
