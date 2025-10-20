@@ -10,13 +10,17 @@ import java.util.*;
 public class Parentesis {
 
     public static double evaluar(String expresion) {
-        if (expresion == null || expresion.trim().isEmpty()) return 0.0;
+        if (expresion == null || expresion.trim().isEmpty()) {
+            return 0.0;
+        }
         // Normalizar símbolos y espacios
         expresion = expresion.replace("×", "*").replace("÷", "/").replaceAll("\\s+", "");
         // Balance básico de paréntesis
         long abiertos = expresion.chars().filter(c -> c == '(').count();
         long cerrados = expresion.chars().filter(c -> c == ')').count();
-        if (abiertos != cerrados) throw new IllegalArgumentException("Paréntesis desbalanceados");
+        if (abiertos != cerrados) {
+            throw new IllegalArgumentException("Paréntesis desbalanceados");
+        }
 
         // Normalizar signos unarios: se tratarán en tokenización (no por reemplazo textual)
         // Insertar multiplicación implícita (ej: 2(3) => 2*(3), )( => )*(, )2 => )*2)
@@ -42,7 +46,7 @@ public class Parentesis {
                 // digit or ')' followed by '(' or digit -> insert '*'
                 if ((Character.isDigit(c) || c == ')' || c == '.') && (nx == '(')) {
                     sb.append('*');
-                } else if ((c == ')' ) && (Character.isDigit(nx) || nx == '(')) {
+                } else if ((c == ')') && (Character.isDigit(nx) || nx == '(')) {
                     sb.append('*');
                 }
             }
@@ -57,12 +61,52 @@ public class Parentesis {
             char c = s.charAt(i);
 
             // número (con decimal)
+            // número (con decimal y notación científica)
             if (Character.isDigit(c) || c == '.') {
                 StringBuilder num = new StringBuilder();
-                while (i < s.length() && (Character.isDigit(s.charAt(i)) || s.charAt(i) == '.')) {
-                    num.append(s.charAt(i));
-                    i++;
+                boolean hasDot = false;
+
+                while (i < s.length()) {
+                    char ch = s.charAt(i);
+
+                    // parte entera/decimal
+                    if (Character.isDigit(ch)) {
+                        num.append(ch);
+                        i++;
+                        continue;
+                    }
+                    if (ch == '.' && !hasDot) {
+                        hasDot = true;
+                        num.append(ch);
+                        i++;
+                        continue;
+                    }
+
+                    // parte exponencial: e o E seguida de (+|-)? dígitos
+                    if (ch == 'e' || ch == 'E') {
+                        num.append(ch);
+                        i++;
+                        // signo opcional del exponente
+                        if (i < s.length() && (s.charAt(i) == '+' || s.charAt(i) == '-')) {
+                            num.append(s.charAt(i));
+                            i++;
+                        }
+                        // ahora deben venir al menos uno o más dígitos
+                        int expStart = i;
+                        while (i < s.length() && Character.isDigit(s.charAt(i))) {
+                            num.append(s.charAt(i));
+                            i++;
+                        }
+                        if (i == expStart) {
+                            throw new IllegalArgumentException("Notación científica mal formada en número: " + num.toString());
+                        }
+                        continue;
+                    }
+
+                    // cualquier otro carácter termina el número
+                    break;
                 }
+
                 tokens.add(num.toString());
                 continue;
             }
@@ -72,9 +116,9 @@ public class Parentesis {
                 // Detectar signo unario: '-' es unario si:
                 // - está al inicio, o precedido por '(' o por otro operador (+ - * /)
                 if (c == '-') {
-                    boolean esUnario = (tokens.isEmpty()) ||
-                            "(".equals(lastToken(tokens)) ||
-                            isOperator(lastToken(tokens));
+                    boolean esUnario = (tokens.isEmpty())
+                            || "(".equals(lastToken(tokens))
+                            || isOperator(lastToken(tokens));
                     if (esUnario) {
                         tokens.add("u-"); // marca de negativo unario
                         i++;
@@ -93,7 +137,9 @@ public class Parentesis {
     }
 
     private static String lastToken(List<String> tokens) {
-        if (tokens.isEmpty()) return null;
+        if (tokens.isEmpty()) {
+            return null;
+        }
         return tokens.get(tokens.size() - 1);
     }
 
@@ -103,10 +149,16 @@ public class Parentesis {
 
     private static int precedence(String op) {
         switch (op) {
-            case "u-": return 4; // unary minus (may consider más alto)
-            case "*": case "/": return 3;
-            case "+": case "-": return 2;
-            default: return 0;
+            case "u-":
+                return 4; // unary minus (may consider más alto)
+            case "*":
+            case "/":
+                return 3;
+            case "+":
+            case "-":
+                return 2;
+            default:
+                return 0;
         }
     }
 
@@ -126,10 +178,12 @@ public class Parentesis {
                     String top = stack.peek();
                     int pTop = precedence(top);
                     int pTok = precedence(tok);
-                    if ((isRightAssociative(tok) && pTok < pTop) ||
-                        (!isRightAssociative(tok) && pTok <= pTop)) {
+                    if ((isRightAssociative(tok) && pTok < pTop)
+                            || (!isRightAssociative(tok) && pTok <= pTop)) {
                         output.add(stack.pop());
-                    } else break;
+                    } else {
+                        break;
+                    }
                 }
                 stack.push(tok);
             } else if (tok.equals("(")) {
@@ -138,8 +192,9 @@ public class Parentesis {
                 while (!stack.isEmpty() && !stack.peek().equals("(")) {
                     output.add(stack.pop());
                 }
-                if (stack.isEmpty() || !stack.peek().equals("("))
+                if (stack.isEmpty() || !stack.peek().equals("(")) {
                     throw new IllegalArgumentException("Paréntesis desbalanceados");
+                }
                 stack.pop(); // quitar "("
             } else {
                 throw new IllegalArgumentException("Token inesperado: " + tok);
@@ -148,7 +203,9 @@ public class Parentesis {
 
         while (!stack.isEmpty()) {
             String t = stack.pop();
-            if (t.equals("(") || t.equals(")")) throw new IllegalArgumentException("Paréntesis desbalanceados");
+            if (t.equals("(") || t.equals(")")) {
+                throw new IllegalArgumentException("Paréntesis desbalanceados");
+            }
             output.add(t);
         }
         return output;
@@ -159,7 +216,9 @@ public class Parentesis {
     }
 
     private static boolean isNumber(String s) {
-        if (s == null || s.isEmpty()) return false;
+        if (s == null || s.isEmpty()) {
+            return false;
+        }
         // simple check: starts with digit or dot and parsable
         try {
             Double.parseDouble(s);
@@ -175,25 +234,40 @@ public class Parentesis {
             if (isNumber(tok)) {
                 stack.push(Double.parseDouble(tok));
             } else if (tok.equals("u-")) {
-                if (stack.isEmpty()) throw new IllegalArgumentException("Operando faltante para unario");
+                if (stack.isEmpty()) {
+                    throw new IllegalArgumentException("Operando faltante para unario");
+                }
                 double v = stack.pop();
                 stack.push(-v);
             } else if (isOperator(tok)) {
-                if (stack.size() < 2) throw new IllegalArgumentException("Operando faltante para operador binario");
+                if (stack.size() < 2) {
+                    throw new IllegalArgumentException("Operando faltante para operador binario");
+                }
                 double b = stack.pop();
                 double a = stack.pop();
                 switch (tok) {
-                    case "+": stack.push(a + b); break;
-                    case "-": stack.push(a - b); break;
-                    case "*": stack.push(a * b); break;
-                    case "/": stack.push(a / b); break;
-                    default: throw new IllegalArgumentException("Operador desconocido: " + tok);
+                    case "+":
+                        stack.push(a + b);
+                        break;
+                    case "-":
+                        stack.push(a - b);
+                        break;
+                    case "*":
+                        stack.push(a * b);
+                        break;
+                    case "/":
+                        stack.push(a / b);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Operador desconocido: " + tok);
                 }
             } else {
                 throw new IllegalArgumentException("Token inválido en RPN: " + tok);
             }
         }
-        if (stack.size() != 1) throw new IllegalArgumentException("Expresión inválida");
+        if (stack.size() != 1) {
+            throw new IllegalArgumentException("Expresión inválida");
+        }
         return stack.pop();
     }
 }
