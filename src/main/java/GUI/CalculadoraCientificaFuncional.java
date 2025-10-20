@@ -114,11 +114,19 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             } else if (textoBoton.matches("[\\+\\-*%/]")) {
                 boton.setBackground(new Color(240, 240, 240));
             }
-            panelBotones.add(boton);
+
+            panelPrincipal.add(panelBotones, BorderLayout.CENTER);
+            add(panelPrincipal);
+
+            // Inicializamos las variables de estado
+            nuevoInput = true;
+            operador = "";
         }
 
-        panelPrincipal.add(panelBotones, BorderLayout.CENTER);
-        add(panelPrincipal);
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String comando = e.getActionCommand();
+            String textoDisplay = display.getText();
 
         // Inicializamos las variables de estado
         nuevoInput = true;
@@ -367,6 +375,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                         display.setText(textoDisplay + comando);
                     }
                     break;
+            }
 
                 // --- Control ---
                 case "C":
@@ -402,15 +411,18 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(f3.getOutput()));
                     break;
             }
-        } catch (NumberFormatException ex) {
-            display.setText("Error de sintaxis");
+
+            primerNumero = resultado; // Permite encadenar operaciones
             nuevoInput = true;
         }
-    }
 
-    private void calcular() {
-        if (operador.isEmpty() || nuevoInput) {
-            return; // No hay operación pendiente o es un input nuevo
+        private long factorial(int n) {
+            if (n > 20) return -1; // Evitar overflow de tipo long
+            long fact = 1;
+            for (int i = 2; i <= n; i++) {
+                fact = fact * i;
+            }
+            return fact;
         }
 
         double segundoNumero = Double.parseDouble(display.getText());
@@ -464,7 +476,6 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         for (int i = 2; i <= n; i++) {
             fact = fact * i;
         }
-        return fact;
     }
 
     private void addToHistory(String entry) {
