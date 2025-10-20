@@ -10,10 +10,7 @@ package Modelo;
  */
 public class Arcotangente {
     
-   
-    public double calcular(double valor) {
+     public static double calcularArcotangente(double valor) {
         return Math.atan(valor);
     }
-
-    
 }
