@@ -342,7 +342,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 case "acos": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.toDegrees(Math.acos(in));
+                    double res;
+                    ArcoCoseno arcocoseno = new ArcoCoseno();
+                    res = arcocoseno.calcularArcoCoseno(in);
                     display.setText(formatNumber(res));
                     addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
                     nuevoInput = true;
