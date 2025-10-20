@@ -10,21 +10,22 @@ package Modelo;
  */
 public class ExponencialEuler {
 
-    private double exponente;  
+    private double primerNumero;  
 
-    public ExponencialEuler(double exponente) {
-        this.exponente = exponente;
+    public ExponencialEuler(double primerNumero) {
+        this.primerNumero = primerNumero;
     }
 
-    public double getExponente() {
-        return exponente;
+    public double getPrimerNumero() {
+        return primerNumero;
     }
 
-    public void setExponente(double exponente) {
-        this.exponente = exponente;
+    public void setPrimerNumero(double primerNumero) {
+        this.primerNumero = primerNumero;
     }
+    
     public double calcularExponencialEuler() {
-        return Math.exp(exponente);
+        return Math.exp(primerNumero);
     }
 
 }
