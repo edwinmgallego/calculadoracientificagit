@@ -67,7 +67,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         display.setFont(new Font("Monospaced", Font.BOLD, 40));
 
         // Panel superior: display + botón Hist
-        JPanel northPanel = new JPanel(new BorderLayout(5,5));
+        JPanel northPanel = new JPanel(new BorderLayout(5, 5));
         northPanel.add(display, BorderLayout.CENTER);
         btnHist = new JButton("Hist");
         btnHist.setFont(new Font("Arial", Font.BOLD, 12));
@@ -89,7 +89,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             // Fila 3 - Potencias y raíces
             "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
             // Fila 4 - Factorial, porcentaje y clear
-            "n!", "%", "C", "CE","<-" , "±", "/",
+            "n!", "%", "C", "CE", "<-", "±", "/",
             // Fila 5 - Números 7 8 9
             "7", "8", "9", "*", "(", ")",
             // Fila 6 - Números 4 5 6
@@ -135,7 +135,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         dialogHistorial = new JDialog(this, "Historial de Operaciones", false);
         dialogHistorial.setSize(420, 480);
         dialogHistorial.setLocationRelativeTo(this);
-        dialogHistorial.setLayout(new BorderLayout(5,5));
+        dialogHistorial.setLayout(new BorderLayout(5, 5));
         dialogHistorial.add(new JScrollPane(historyList), BorderLayout.CENTER);
 
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -184,8 +184,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
 
                 // --- Operadores Binarios (+, -, *, /, %, x^y, x√y) ---
-                case "+": case "-": case "*": case "/": case "%":
-                case "xʸ": case "x√y":
+                case "+":
+                case "-":
+                case "*":
+                case "/":
+                case "%":
+                case "xʸ":
+                case "x√y":
                     calcular(); // resuelve operación pendiente antes de cambiar el operador
                     operador = comando;
                     primerNumero = Double.parseDouble(display.getText());
@@ -266,13 +271,25 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 case "log": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.log10(in);
-                    display.setText(formatNumber(res));
-                    addToHistory("log(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    try {
+                        
+                        LogaritmoBase10 logCalc = new LogaritmoBase10(in);
+                        double res = logCalc.getResultado();
+
+                        
+                        display.setText(formatNumber(res));
+                        addToHistory("log(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    } catch (IllegalArgumentException ex) {
+                        display.setText("Error: " + ex.getMessage());
+                        nuevoInput = true;
+                    }
                     break;
                 }
-                case "eˣ": {
+            
+        
+    
+    case "eˣ": {
                     double in = Double.parseDouble(textoDisplay);
                     double res = Math.exp(in);
                     display.setText(formatNumber(res));
@@ -370,13 +387,16 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(f3.getOutput()));
                     break;
             }
-        } catch (NumberFormatException ex) {
-            display.setText("Error de sintaxis");
-            nuevoInput = true;
-        }
-    }
+        } catch (NumberFormatException ex
 
-    private void calcular() {
+    
+        ) {
+            display.setText("Error de sintaxis");
+        nuevoInput = true;
+    }
+}
+
+private void calcular() {
         if (operador.isEmpty() || nuevoInput) {
             return; // No hay operación pendiente o es un input nuevo
         }
