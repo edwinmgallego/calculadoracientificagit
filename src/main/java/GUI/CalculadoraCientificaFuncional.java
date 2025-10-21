@@ -8,15 +8,22 @@ package GUI;
  *
  * @author cript
  */
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.ButtonGroup; 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -33,6 +40,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private double primerNumero;
     private String operador;
     private boolean nuevoInput; // Para controlar si se debe limpiar la pantalla
+
+    // --- CÓDIGO AÑADIDO: Variable para el modo de ángulo ---
+    private String modoAnguloActual = "DEG";
 
     public CalculadoraCientificaFuncional() {
         // --- Configuración de la Ventana (JFrame) ---
@@ -53,17 +63,42 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         display.setFont(new Font("Monospaced", Font.BOLD, 40));
         panelPrincipal.add(display, BorderLayout.NORTH);
 
+        //Panel intermedio para organizar los botones
+        JPanel panelCentral = new JPanel(new BorderLayout());
+
+        //Panel con los botones de modo de ángulo
+        JPanel panelModoAngulo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JRadioButton degRadio = new JRadioButton("DEG");
+        degRadio.setSelected(true);
+        JRadioButton radRadio = new JRadioButton("RAD");
+        JRadioButton gradRadio = new JRadioButton("GRAD");
+
+        ButtonGroup grupoAngulo = new ButtonGroup();
+        grupoAngulo.add(degRadio);
+        grupoAngulo.add(radRadio);
+        grupoAngulo.add(gradRadio);
+
+        degRadio.addActionListener(e -> modoAnguloActual = "DEG");
+        radRadio.addActionListener(e -> modoAnguloActual = "RAD");
+        gradRadio.addActionListener(e -> modoAnguloActual = "GRAD");
+
+        panelModoAngulo.add(degRadio);
+        panelModoAngulo.add(radRadio);
+        panelModoAngulo.add(gradRadio);
+        
+        panelCentral.add(panelModoAngulo, BorderLayout.NORTH); // Añadimos el panel de angulos arriba
+
         // --- Panel de Botones ---
         JPanel panelBotones = new JPanel(new GridLayout(6, 6, 5, 5));
 
         // Etiquetas de los botones según las funciones solicitadas
         String[] botones = {
-            "sin", "cos", "tan", "asin", "acos", "atan",
-            "xʸ", "√", "∛", "x√y", "ln", "log",
-            "eˣ", "10ˣ", "1/x", "n!", "%", "C",
-            "7", "8", "9", "/", "CE", "±",
-            "4", "5", "6", "*", "1", "2",
-            "3", "-", "0", ".", "=", "+"
+                "sin", "cos", "tan", "asin", "acos", "atan",
+                "xʸ", "√", "∛", "x√y", "ln", "log",
+                "eˣ", "10ˣ", "1/x", "n!", "%", "C",
+                "7", "8", "9", "/", "CE", "±",
+                "4", "5", "6", "*", "1", "2",
+                "3", "-", "0", ".", "=", "+"
         };
 
         for (String textoBoton : botones) {
@@ -83,7 +118,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             panelBotones.add(boton);
         }
 
-        panelPrincipal.add(panelBotones, BorderLayout.CENTER);
+        // Se añade el panel de botones al panel central
+        panelCentral.add(panelBotones, BorderLayout.CENTER);
+        panelPrincipal.add(panelCentral, BorderLayout.CENTER);
+
         add(panelPrincipal);
 
         // Inicializamos las variables de estado
@@ -138,7 +176,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(Math.sqrt(primerNumero)));
                     break;
                 case "∛":
-                     primerNumero = Double.parseDouble(textoDisplay);
+                    primerNumero = Double.parseDouble(textoDisplay);
                     display.setText(String.valueOf(Math.cbrt(primerNumero)));
                     break;
                 case "x²": // Este no estaba en la lista pero es común, lo añado como ejemplo
@@ -176,27 +214,72 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(Math.exp(Double.parseDouble(textoDisplay))));
                     break;
                 case "10ˣ":
-                     display.setText(String.valueOf(Math.pow(10, Double.parseDouble(textoDisplay))));
+                    display.setText(String.valueOf(Math.pow(10, Double.parseDouble(textoDisplay))));
                     break;
 
-                // --- Trigonométricas (en radianes) ---
+                // Trigonométricas (en radianes) 
                 case "sin":
-                    display.setText(String.valueOf(Math.sin(Math.toRadians(Double.parseDouble(textoDisplay)))));
+                   // Modificado
+                    double anguloSin = Double.parseDouble(textoDisplay);
+                    if (modoAnguloActual.equals("DEG")) {
+                        anguloSin = Math.toRadians(anguloSin);
+                    } else if (modoAnguloActual.equals("GRAD")) {
+                        anguloSin = anguloSin * (Math.PI / 200.0);
+                    }
+                    display.setText(String.valueOf(Math.sin(anguloSin)));
                     break;
                 case "cos":
-                    display.setText(String.valueOf(Math.cos(Math.toRadians(Double.parseDouble(textoDisplay)))));
+                    // Modificado
+                    double anguloCos = Double.parseDouble(textoDisplay);
+                    if (modoAnguloActual.equals("DEG")) {
+                        anguloCos = Math.toRadians(anguloCos);
+                    } else if (modoAnguloActual.equals("GRAD")) {
+                        anguloCos = anguloCos * (Math.PI / 200.0);
+                    }
+                    display.setText(String.valueOf(Math.cos(anguloCos)));
                     break;
                 case "tan":
-                    display.setText(String.valueOf(Math.tan(Math.toRadians(Double.parseDouble(textoDisplay)))));
+                  // Modificado 
+                    double anguloTan = Double.parseDouble(textoDisplay);
+                    if (modoAnguloActual.equals("DEG")) {
+                        anguloTan = Math.toRadians(anguloTan);
+                    } else if (modoAnguloActual.equals("GRAD")) {
+                        anguloTan = anguloTan * (Math.PI / 200.0);
+                    }
+                    display.setText(String.valueOf(Math.tan(anguloTan)));
                     break;
                 case "asin":
-                    display.setText(String.valueOf(Math.toDegrees(Math.asin(Double.parseDouble(textoDisplay)))));
+                   // Modificado
+                    double valorAsin = Double.parseDouble(textoDisplay);
+                    double resultadoAsin = Math.asin(valorAsin); // Resultado en radianes
+                    if (modoAnguloActual.equals("DEG")) {
+                        resultadoAsin = Math.toDegrees(resultadoAsin);
+                    } else if (modoAnguloActual.equals("GRAD")) {
+                        resultadoAsin = resultadoAsin * (200.0 / Math.PI);
+                    }
+                    display.setText(String.valueOf(resultadoAsin));
                     break;
                 case "acos":
-                    display.setText(String.valueOf(Math.toDegrees(Math.acos(Double.parseDouble(textoDisplay)))));
+                   // Modificado
+                    double valorAcos = Double.parseDouble(textoDisplay);
+                    double resultadoAcos = Math.acos(valorAcos); // Resultado en radianes
+                    if (modoAnguloActual.equals("DEG")) {
+                        resultadoAcos = Math.toDegrees(resultadoAcos);
+                    } else if (modoAnguloActual.equals("GRAD")) {
+                        resultadoAcos = resultadoAcos * (200.0 / Math.PI);
+                    }
+                    display.setText(String.valueOf(resultadoAcos));
                     break;
                 case "atan":
-                    display.setText(String.valueOf(Math.toDegrees(Math.atan(Double.parseDouble(textoDisplay)))));
+                    // Modificado
+                    double valorAtan = Double.parseDouble(textoDisplay);
+                    double resultadoAtan = Math.atan(valorAtan); // Resultado en radianes
+                    if (modoAnguloActual.equals("DEG")) {
+                        resultadoAtan = Math.toDegrees(resultadoAtan);
+                    } else if (modoAnguloActual.equals("GRAD")) {
+                        resultadoAtan = resultadoAtan * (200.0 / Math.PI);
+                    }
+                    display.setText(String.valueOf(resultadoAtan));
                     break;
 
                 // --- Control ---
@@ -248,7 +331,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             case "xʸ":
                 resultado = Math.pow(primerNumero, segundoNumero);
                 break;
-             case "x√y":
+            case "x√y":
                 resultado = Math.pow(primerNumero, 1.0 / segundoNumero);
                 break;
         }
@@ -259,11 +342,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         } else {
             display.setText(String.format("%s", resultado));
         }
-        
+
         primerNumero = resultado; // Permite encadenar operaciones
         nuevoInput = true;
     }
-    
+
     private long factorial(int n) {
         if (n > 20) return -1; // Evitar overflow de tipo long
         long fact = 1;
@@ -293,3 +376,4 @@ sadkjfa
  
  
  */
+
