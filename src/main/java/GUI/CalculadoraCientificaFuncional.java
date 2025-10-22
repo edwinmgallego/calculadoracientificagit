@@ -381,7 +381,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(textoDisplay);
                     nuevoInput = textoDisplay.equals("0");
                     break;
-
+                    
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
                     nuevoInput = false;
