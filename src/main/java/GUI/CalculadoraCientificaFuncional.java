@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import Modelo.BotonBorrado;
 import Modelo.*;
 
 /**
@@ -346,10 +347,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
                 // --- Control ---
                 case "C":
-                    primerNumero = 0;
-                    operador = "";
+                    
+                    BotonBorrado b = new BotonBorrado();
+                    b.borrarPantalla();
                     display.setText("0");
-                    nuevoInput = true;
                     break;
                 case "CE":
                     display.setText("0");

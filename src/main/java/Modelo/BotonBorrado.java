@@ -12,22 +12,17 @@ import javax.swing.JTextField;
 public class BotonBorrado {
     
     private JTextField display;
-    private double primerNumero;
-    private String operador;
+    private double primerNumero = 1;
+    private String operador = "+";
     private boolean nuevoInput;
 
-    public BotonBorrado(JTextField display, double primerNumero, String operador, boolean nuevoInput, String opcion) {
-        this.display = display;
-        this.primerNumero = primerNumero;
-        this.operador = operador;
-        this.nuevoInput = nuevoInput;
-    }
+
     
     public void borrarPantalla() {
 
                     primerNumero = 0;
                     operador = "";
-                    display.setText("0");
+                  
                     nuevoInput = true;    
 
     }
