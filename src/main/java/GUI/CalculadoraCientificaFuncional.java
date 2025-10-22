@@ -398,7 +398,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 resultado = primerNumero - segundoNumero;
                 break;
             case "*":
-                resultado = primerNumero * segundoNumero;
+                Multiplicacion multi = new Multiplicacion();
+                resultado = multi.multiplicar(primerNumero, segundoNumero);
+                //resultado = primerNumero * segundoNumero;
                 break;
             case "/":
                 if (segundoNumero == 0) {
