@@ -4,13 +4,14 @@
 
 package com.mycompany.calculadoragrupalpromedio;
 
-/**
- *
- * @author luisb
- */
+import Modelo.Promedio;
+
 public class CalculadoraGrupalPromedio {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Promedio p = new Promedio();
+        double[] valores = {5, 10, 15, 20};
+        p.setNumeros(valores);
+        System.out.println("El promedio es: " + p.calcular());
     }
 }
