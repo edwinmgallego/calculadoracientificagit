@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import Modelo.*;
+import Modelo.Exponencial;
 
 /**
  * Clase que crea la interfaz y la funcionalidad de una calculadora científica.
@@ -406,8 +407,12 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 resultado = primerNumero % segundoNumero;
                 break;
             case "xʸ":
-                resultado = Math.pow(primerNumero, segundoNumero);
+                //resultado = Math.pow(primerNumero, segundoNumero);
+                //break;
+                Exponencial expo = new Exponencial (); 
+                resultado = expo.Expocinencial(primerNumero, segundoNumero);
                 break;
+
             case "x√y":
                 resultado = Math.pow(primerNumero, 1.0 / segundoNumero);
                 break;
