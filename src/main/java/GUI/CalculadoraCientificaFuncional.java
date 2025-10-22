@@ -89,7 +89,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             "7", "8", "9", "/", "CE", "±",
             "4", "5", "6", "*", "(", ")",
             "1", "2", "3", "-", "0", ".",
-            "=", "+"
+            "=", "+","<-",
         };
 
         for (String textoBoton : botones) {
