@@ -1,7 +1,6 @@
 package Modelo;
 
 public class Parentesis {
-
     public static double evaluar(String expresion) {
         expresion = expresion.replace(" ", "");
 
@@ -116,4 +115,5 @@ public class Parentesis {
 
         return resultado;
     }
+
 }

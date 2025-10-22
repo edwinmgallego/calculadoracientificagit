@@ -68,7 +68,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         display.setFont(new Font("Monospaced", Font.BOLD, 40));
 
         // Panel superior: display + botón Hist
-        JPanel northPanel = new JPanel(new BorderLayout(5, 5));
+        JPanel northPanel = new JPanel(new BorderLayout(5,5));
         northPanel.add(display, BorderLayout.CENTER);
         btnHist = new JButton("Hist");
         btnHist.setFont(new Font("Arial", Font.BOLD, 12));
@@ -90,7 +90,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             "7", "8", "9", "/", "CE", "±",
             "4", "5", "6", "*", "(", ")",
             "1", "2", "3", "-", "0", ".",
-            "=", "+"
+            "=", "+", "sinh", "cosh", "tanh"
         };
 
         for (String textoBoton : botones) {
@@ -129,7 +129,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         dialogHistorial = new JDialog(this, "Historial de Operaciones", false);
         dialogHistorial.setSize(420, 480);
         dialogHistorial.setLocationRelativeTo(this);
-        dialogHistorial.setLayout(new BorderLayout(5, 5));
+        dialogHistorial.setLayout(new BorderLayout(5,5));
         dialogHistorial.add(new JScrollPane(historyList), BorderLayout.CENTER);
 
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -317,8 +317,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "tan": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.tan(Math.toRadians(in));
+                     double in = Double.parseDouble(textoDisplay);
+                    FuncionTangente tan = new FuncionTangente(in);
+                    double res = tan.calcularTangente();
                     display.setText(formatNumber(res));
                     addToHistory("tan(" + formatNumber(in) + "°) = " + formatNumber(res));
                     nuevoInput = true;
@@ -382,10 +383,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(textoDisplay);
                     nuevoInput = textoDisplay.equals("0");
                     break;
-
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
-                    nuevoInput = false;
                     break;
 
                 // --- Funciones hiperbólicas ---
@@ -421,8 +420,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     }
 
     private void calcular() {
-        if (operador.isEmpty()) {
-            return;
+        if (operador.isEmpty() || nuevoInput) {
+            return; // No hay operación pendiente o es un input nuevo
         }
 
         double segundoNumero = Double.parseDouble(display.getText());
@@ -521,9 +520,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     }
 
     private void addToHistory(String entry) {
-        if (historyModel == null) {
-            return;
-        }
+        if (historyModel == null) return;
         if (historyModel.getSize() >= HISTORY_LIMIT) {
             historyModel.remove(0);
         }
@@ -531,12 +528,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     }
 
     private String formatNumber(double val) {
-        if (Double.isNaN(val)) {
-            return "NaN";
-        }
-        if (Double.isInfinite(val)) {
-            return val > 0 ? "Infinity" : "-Infinity";
-        }
+        if (Double.isNaN(val)) return "NaN";
+        if (Double.isInfinite(val)) return val > 0 ? "Infinity" : "-Infinity";
         if (val == (long) val) {
             return String.format("%d", (long) val);
         } else {
