@@ -4,6 +4,10 @@
 
 package com.mycompany.calculadoracienteficagit;
 
+import GUI.CalculadoraCientificaFuncional;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 /**
  *
  * @author cript
@@ -11,6 +15,13 @@ package com.mycompany.calculadoracienteficagit;
 public class CalculadoraCienteficaGit {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            new CalculadoraCientificaFuncional().setVisible(true);
+        });
     }
 }

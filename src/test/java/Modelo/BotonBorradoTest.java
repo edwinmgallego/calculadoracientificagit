@@ -17,6 +17,27 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Usuario
  */
 public class BotonBorradoTest {
-    
-    
+     private final BotonBorrado botonBorrado = new BotonBorrado();
+
+   
+
+    @Test
+    void testBorrarPantalla_RestableceValores() {
+        
+        botonBorrado.borrarPantalla();
+
+        assertEquals(0, botonBorrado.getPrimerNumero(), "El primer número debe ser 0");
+        assertEquals("", botonBorrado.getOperador(), "El operador debe estar vacío");
+        assertTrue(botonBorrado.isNuevoInput(), "nuevoInput debe ser true");
+    }
+
+    @Test
+    void testValoresIniciales_CorrectosAntesDeBorrar() {
+        assertEquals(1, botonBorrado.getPrimerNumero(), "El primer número inicial debe ser 1");
+        assertEquals("+", botonBorrado.getOperador(), "El operador inicial debe ser '+'");
+        assertFalse(botonBorrado.isNuevoInput(), "nuevoInput inicial debe ser false");
+    }
+   
 }
+    
+
