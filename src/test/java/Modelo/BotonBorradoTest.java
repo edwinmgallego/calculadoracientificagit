@@ -17,8 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Usuario
  */
 public class BotonBorradoTest {
-
-   private final BotonBorrado botonBorrado = new BotonBorrado();
+     private final BotonBorrado botonBorrado = new BotonBorrado();
 
    
 
@@ -40,3 +39,5 @@ public class BotonBorradoTest {
     }
    
 }
+    
+

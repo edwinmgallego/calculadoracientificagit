@@ -6,11 +6,11 @@ package Modelo;
 
 /**
  *
- * @author Angello
+ * @author efrai
  */
-public class RaizCuadrada {
+public class ArcoCoseno {
+
     private double primerNumero;
-    private double resultado;
 
     public double getPrimerNumero() {
         return primerNumero;
@@ -20,18 +20,10 @@ public class RaizCuadrada {
         this.primerNumero = primerNumero;
     }
 
-    public double getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(double resultado) {
-        this.resultado = resultado;
-    }
-    
-    public double Raiz(double primerNumero){
-        
-        resultado = Math.sqrt(primerNumero);
-        
-        return resultado;
+    public static double calcularArcoCoseno(double primerNumero) {
+        if (primerNumero < -1 || primerNumero > 1) {
+            throw new IllegalArgumentException("El valor debe estar entre -1 y 1");
+        }
+        return Math.acos(primerNumero);
     }
 }

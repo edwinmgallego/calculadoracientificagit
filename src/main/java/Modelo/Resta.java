@@ -5,40 +5,37 @@
 package Modelo;
 
 /**
- *
- * @author migue
+ * Clase que implementa la funcionalidad de Resta para la calculadora científica.
+ * 
+ * @author [Tu Nombre]
  */
-public class Multiplicacion {
+public class Resta {
+    
     private double primerNumero;
     private double segundoNumero;
     private double resultado;
-
-    public double getPrimerNumero() {
-        return primerNumero;
+    
+ 
+    public Resta() {
+        this.primerNumero = 0;
+        this.segundoNumero = 0;
+        this.resultado = 0;
     }
-
+    
     public void setPrimerNumero(double primerNumero) {
         this.primerNumero = primerNumero;
     }
-
-    public double getSegundoNumero() {
-        return segundoNumero;
-    }
-
+    
     public void setSegundoNumero(double segundoNumero) {
         this.segundoNumero = segundoNumero;
+    }
+    public double calcular() {
+        resultado = primerNumero - segundoNumero;
+        return resultado;
     }
 
     public double getResultado() {
         return resultado;
     }
-
-    public void setResultado(double resultado) {
-        this.resultado = resultado;
-    }
-    
-    public double multiplicar (double primerNumero, double segundoNumero){
-        resultado=primerNumero*segundoNumero;
-        return resultado;
-    }
 }
+

@@ -16,16 +16,13 @@ public class BotonBorrado {
     private String operador = "+";
     private boolean nuevoInput;
 
-    public void BotonBorrado(double primerNumero, String operador){
-    this.primerNumero = primerNumero;
-    this.operador = operador;
-    
-    }
+
     
     public void borrarPantalla() {
 
                     primerNumero = 0;
-                    operador = ""; 
+                    operador = "";
+                  
                     nuevoInput = true;    
 
     }
