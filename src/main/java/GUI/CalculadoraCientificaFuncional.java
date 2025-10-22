@@ -29,8 +29,6 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import Modelo.*;
 
-import Modelo.RaizCubica;
-
 /**
  * Clase que crea la interfaz y la funcionalidad de una calculadora científica.
  */
@@ -69,7 +67,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         display.setFont(new Font("Monospaced", Font.BOLD, 40));
 
         // Panel superior: display + botón Hist
-        JPanel northPanel = new JPanel(new BorderLayout(5, 5));
+        JPanel northPanel = new JPanel(new BorderLayout(5,5));
         northPanel.add(display, BorderLayout.CENTER);
         btnHist = new JButton("Hist");
         btnHist.setFont(new Font("Arial", Font.BOLD, 12));
@@ -86,11 +84,18 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         String[] botones = {
             // Fila 1 - Trigonométricas
             "sin", "cos", "tan", "asin", "acos", "atan",
-            "xʸ", "√", "3√x", "x√y", "ln", "log",
-            "eˣ", "10ˣ", "1/x", "n!", "%", "C",
-            "7", "8", "9", "/", "CE", "±",
-            "4", "5", "6", "*", "1", "2",
-            "3", "-", "0", ".", "=", "+"
+            // Fila 2 - Hiperbólicas
+            "sinh", "cosh", "tanh", "ln", "log", "eˣ",
+            // Fila 3 - Potencias y raíces
+            "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
+            // Fila 4 - Factorial, porcentaje y clear
+            "n!", "%", "C", "CE","<-" , "±", "/",
+            // Fila 5 - Números 7 8 9
+            "7", "8", "9", "*", "(", ")",
+            // Fila 6 - Números 4 5 6
+            "4", "5", "6", "-", "=", " ",
+            // Fila 7 - Números 1 2 3 0 . =
+            "1", "2", "3", "0", "+", "."
         };
 
         for (String textoBoton : botones) {
@@ -109,19 +114,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             } else if (textoBoton.matches("[\\+\\-*%/]")) {
                 boton.setBackground(new Color(240, 240, 240));
             }
-
-            panelPrincipal.add(panelBotones, BorderLayout.CENTER);
-            add(panelPrincipal);
-
-            // Inicializamos las variables de estado
-            nuevoInput = true;
-            operador = "";
+            panelBotones.add(boton);
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String comando = e.getActionCommand();
-            String textoDisplay = display.getText();
+        panelPrincipal.add(panelBotones, BorderLayout.CENTER);
+        add(panelPrincipal);
 
         // Inicializamos las variables de estado
         nuevoInput = true;
@@ -138,7 +135,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         dialogHistorial = new JDialog(this, "Historial de Operaciones", false);
         dialogHistorial.setSize(420, 480);
         dialogHistorial.setLocationRelativeTo(this);
-        dialogHistorial.setLayout(new BorderLayout(5, 5));
+        dialogHistorial.setLayout(new BorderLayout(5,5));
         dialogHistorial.add(new JScrollPane(historyList), BorderLayout.CENTER);
 
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -187,13 +184,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
 
                 // --- Operadores Binarios (+, -, *, /, %, x^y, x√y) ---
-                case "+":
-                case "-":
-                case "*":
-                case "/":
-                case "%":
-                case "xʸ":
-                case "x√y":
+                case "+": case "-": case "*": case "/": case "%":
+                case "xʸ": case "x√y":
                     calcular(); // resuelve operación pendiente antes de cambiar el operador
                     operador = comando;
                     primerNumero = Double.parseDouble(display.getText());
@@ -202,21 +194,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
                 // --- Botón de Igual ---
                 case "=":
-                    try {
-                        String expr = display.getText();
-                        // Si la expresión contiene paréntesis o varios operadores, usar Parentesis
-                        if (expr.contains("(") || expr.contains(")") || expr.matches(".*[+\\-*/].*")) {
-                            double resultado = Parentesis.evaluar(expr);
-                            display.setText(formatNumber(resultado));
-                            addToHistory(expr + " = " + formatNumber(resultado));
-                        } else {
-                            calcular();
-                        }
-                    } catch (Exception exPar) {
-                        display.setText("Error: " + exPar.getMessage());
-                    }
+                    calcular();
                     operador = "";
-                    nuevoInput = true;
                     break;
 
                 // --- Operadores Unarios (operan sobre el número actual) ---
@@ -227,11 +206,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     addToHistory("√(" + formatNumber(in) + ") = " + formatNumber(res));
                     nuevoInput = true;
                     break;
-                case "3√x":
-                     RaizCubica rc = new RaizCubica();
-                     primerNumero = Double.parseDouble(textoDisplay);
-                     rc.setPrimerNumero(Double.parseDouble(textoDisplay));
-                     display.setText(String.valueOf(rc.raizCubica()));
+                }
+                case "∛": {
+                    double in = Double.parseDouble(textoDisplay);
+                    double res = Math.cbrt(in);
+                    display.setText(formatNumber(res));
+                    addToHistory("∛(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = true;
                     break;
                 }
                 case "x²": {
@@ -326,8 +307,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "tan": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.tan(Math.toRadians(in));
+                     double in = Double.parseDouble(textoDisplay);
+                    FuncionTangente tan = new FuncionTangente(in);
+                    double res = tan.calcularTangente();
                     display.setText(formatNumber(res));
                     addToHistory("tan(" + formatNumber(in) + "°) = " + formatNumber(res));
                     nuevoInput = true;
@@ -343,39 +325,20 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 case "acos": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res;
-                    ArcoCoseno arcocoseno = new ArcoCoseno();
-                    if (in < -1 || in > 1) {
-                        display.setText("MathERROR");
-                    } else{
-                        res = arcocoseno.calcularArcoCoseno(in);
-                        display.setText(formatNumber(res));
-                        addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
-                    }
+                    double res = Math.toDegrees(Math.acos(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
                     nuevoInput = true;
                     break;
                 }
                 case "atan": {
                     double in = Double.parseDouble(textoDisplay);
-                     Arcotangente arcotangente = new Arcotangente();
-                     double res = Math.toDegrees(arcotangente.calcularArcotangente(in));
-                     display.setText(formatNumber(res));
-                     addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
-                     nuevoInput = true;
-                     break;
-                }
-
-                // --- Paréntesis ---
-                case "(":
-                case ")":
-                    if (nuevoInput) {
-                        display.setText(comando);
-                        nuevoInput = false;
-                    } else {
-                        display.setText(textoDisplay + comando);
-                    }
+                    double res = Math.toDegrees(Math.atan(in));
+                    display.setText(formatNumber(res));
+                    addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    nuevoInput = true;
                     break;
-            }
+                }
 
                 // --- Control ---
                 case "C":
@@ -385,15 +348,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 case "CE":
-                    textoDisplay = BotonCE.limpiarEntradaActual(textoDisplay); 
-                    display.setText(textoDisplay);
-                    nuevoInput = textoDisplay.equals("0");
+                    display.setText("0");
+                    nuevoInput = true;
                     break;
-
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
-                    nuevoInput = false;
-                    break;
 
                 // --- Funciones hiperbólicas ---
                 case "sinh":
@@ -412,18 +371,15 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(f3.getOutput()));
                     break;
             }
-
-            primerNumero = resultado; // Permite encadenar operaciones
+        } catch (NumberFormatException ex) {
+            display.setText("Error de sintaxis");
             nuevoInput = true;
         }
+    }
 
-        private long factorial(int n) {
-            if (n > 20) return -1; // Evitar overflow de tipo long
-            long fact = 1;
-            for (int i = 2; i <= n; i++) {
-                fact = fact * i;
-            }
-            return fact;
+    private void calcular() {
+        if (operador.isEmpty() || nuevoInput) {
+            return; // No hay operación pendiente o es un input nuevo
         }
 
         double segundoNumero = Double.parseDouble(display.getText());
@@ -477,12 +433,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         for (int i = 2; i <= n; i++) {
             fact = fact * i;
         }
+        return fact;
     }
 
     private void addToHistory(String entry) {
-        if (historyModel == null) {
-            return;
-        }
+        if (historyModel == null) return;
         if (historyModel.getSize() >= HISTORY_LIMIT) {
             historyModel.remove(0);
         }
@@ -490,12 +445,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     }
 
     private String formatNumber(double val) {
-        if (Double.isNaN(val)) {
-            return "NaN";
-        }
-        if (Double.isInfinite(val)) {
-            return val > 0 ? "Infinity" : "-Infinity";
-        }
+        if (Double.isNaN(val)) return "NaN";
+        if (Double.isInfinite(val)) return val > 0 ? "Infinity" : "-Infinity";
         if (val == (long) val) {
             return String.format("%d", (long) val);
         } else {
