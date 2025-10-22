@@ -8,17 +8,15 @@ package Modelo;
  *
  * @author Sofia
  */
-public class Módulo {
+public class Modulo {
     
     public double primerNumero;
     public double segundoNumero;
     public double resultado;
     
-    public void calcularModulo(){
+    public double calcularModulo(double primerNumero, double segundoNumero){
         
-       resultado= primerNumero % segundoNumero;
+       return resultado= primerNumero % segundoNumero;
     }
-    
-    
     
 }
