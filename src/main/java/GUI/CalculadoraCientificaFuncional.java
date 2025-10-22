@@ -22,6 +22,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import Modelo.RaizCubica;
+
 /**
  * Clase que crea la interfaz y la funcionalidad de una calculadora científica.
  */
@@ -59,7 +61,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         // Etiquetas de los botones según las funciones solicitadas
         String[] botones = {
             "sin", "cos", "tan", "asin", "acos", "atan",
-            "xʸ", "√", "∛", "x√y", "ln", "log",
+            "xʸ", "√", "3√x", "x√y", "ln", "log",
             "eˣ", "10ˣ", "1/x", "n!", "%", "C",
             "7", "8", "9", "/", "CE", "±",
             "4", "5", "6", "*", "1", "2",
@@ -137,9 +139,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     primerNumero = Double.parseDouble(textoDisplay);
                     display.setText(String.valueOf(Math.sqrt(primerNumero)));
                     break;
-                case "∛":
+                case "3√x":
+                     RaizCubica rc = new RaizCubica();
                      primerNumero = Double.parseDouble(textoDisplay);
-                    display.setText(String.valueOf(Math.cbrt(primerNumero)));
+                     rc.setPrimerNumero(Double.parseDouble(textoDisplay));
+                     display.setText(String.valueOf(rc.raizCubica()));
                     break;
                 case "x²": // Este no estaba en la lista pero es común, lo añado como ejemplo
                     primerNumero = Double.parseDouble(textoDisplay);
@@ -249,7 +253,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 resultado = Math.pow(primerNumero, segundoNumero);
                 break;
              case "x√y":
-                resultado = Math.pow(primerNumero, 1.0 / segundoNumero);
+                resultado = Math.pow(primerNumero, 1.0 / segundoNumero); 
+                 
                 break;
         }
 
