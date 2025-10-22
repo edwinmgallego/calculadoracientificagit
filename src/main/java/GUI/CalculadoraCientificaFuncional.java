@@ -392,10 +392,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 case "CE":
-                    display.setText("0");
-                    nuevoInput = true;
+                    textoDisplay = BotonCE.limpiarEntradaActual(textoDisplay); 
+                    display.setText(textoDisplay);
+                    nuevoInput = textoDisplay.equals("0");
                     break;
-                //se solucionó un problema que había con el del
+
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
                     nuevoInput = false;
