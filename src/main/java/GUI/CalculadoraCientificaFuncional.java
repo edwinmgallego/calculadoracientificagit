@@ -405,8 +405,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 resultado = primerNumero / segundoNumero;
                 break;
             case "%":
-                Modulo mod= new Modulo();
-                resultado= mod.calcularModulo(primerNumero, segundoNumero);
+                
+                Modulo modulo= new Modulo();
+                resultado= modulo.calcularModulo(primerNumero, segundoNumero);
                 break;
             case "xʸ":
                 resultado = Math.pow(primerNumero, segundoNumero);
