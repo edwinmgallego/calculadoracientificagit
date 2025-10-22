@@ -28,7 +28,7 @@ public class RaizCuadrada {
         this.resultado = resultado;
     }
     
-    public double raiz(double primerNumero){
+    public double Raiz(double primerNumero){
         
         resultado = Math.sqrt(primerNumero);
         

@@ -200,10 +200,14 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
                 // --- Operadores Unarios (operan sobre el número actual) ---
                 case "√": {
+                    
+                    RaizCuadrada raiz = new RaizCuadrada();
+                    
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.sqrt(in);
+                    double res = raiz.Raiz(in);
                     display.setText(formatNumber(res));
                     addToHistory("√(" + formatNumber(in) + ") = " + formatNumber(res));
+                    
                     nuevoInput = true;
                     break;
                 }
@@ -455,14 +459,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            new CalculadoraCientificaFuncional().setVisible(true);
-        });
-    }
+    /*public static void main(String[] args) {
+        
+    }*/
 }

@@ -25,7 +25,7 @@ public class RaizCuadradaTest {
         double primerNumero = 4;
         RaizCuadrada instance = new RaizCuadrada();
         double expResult = 2;
-        double result = instance.raiz(primerNumero);
+        double result = instance.Raiz(primerNumero);
         assertEquals(expResult, result, 0);
         // TODO review the generated test code and remove the default call to fail.
         
