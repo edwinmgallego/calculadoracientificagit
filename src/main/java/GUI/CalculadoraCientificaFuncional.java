@@ -307,8 +307,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "tan": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.tan(Math.toRadians(in));
+                     double in = Double.parseDouble(textoDisplay);
+                    FuncionTangente tan = new FuncionTangente(in);
+                    double res = tan.calcularTangente();
                     display.setText(formatNumber(res));
                     addToHistory("tan(" + formatNumber(in) + "°) = " + formatNumber(res));
                     nuevoInput = true;
@@ -350,7 +351,6 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText("0");
                     nuevoInput = true;
                     break;
-                //se solucionó un problema que había con el DEL "<-"
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
                     break;
