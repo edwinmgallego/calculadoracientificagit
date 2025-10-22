@@ -28,7 +28,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import Modelo.*;
-import Modelo.Exponencial;
 
 /**
  * Clase que crea la interfaz y la funcionalidad de una calculadora científica.
@@ -247,12 +246,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "±": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = -in;
-                    display.setText(formatNumber(res));
-                    nuevoInput = false;
-                    break;
-                }
+                 double in = Double.parseDouble(textoDisplay);
+                 CambioSigno operacion = new CambioSigno(in);
+                 double res = operacion.calcularCambioSigno();
+                 display.setText(formatNumber(res));
+                 nuevoInput = false;
+                 break;
+                   }
                 case "n!": {
                     double in = Double.parseDouble(textoDisplay);
                     if (in >= 0 && in == (int) in && in <= 20) {
@@ -302,7 +302,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 // --- Trigonométricas (usamos entrada en grados por usabilidad) ---
                 case "sin": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.sin(Math.toRadians(in));
+                    double res = Seno.calcularSeno(in);
                     display.setText(formatNumber(res));
                     addToHistory("sin(" + formatNumber(in) + "°) = " + formatNumber(res));
                     nuevoInput = true;
@@ -317,7 +317,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "tan": {
-                     double in = Double.parseDouble(textoDisplay);
+                    double in = Double.parseDouble(textoDisplay);
                     FuncionTangente tan = new FuncionTangente(in);
                     double res = tan.calcularTangente();
                     display.setText(formatNumber(res));
@@ -359,7 +359,6 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 }
-// --- Paréntesis ---
                 // --- Paréntesis ---
                 case "(":
                 case ")":
@@ -420,45 +419,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     }
 
     private void calcular() {
-        if (operador.isEmpty() || nuevoInput) {
-            return; // No hay operación pendiente o es un input nuevo
-        }
+        try {
+            if (operador.isEmpty() || nuevoInput) {
+                return; // No hay operación pendiente o es un input nuevo
+            }
 
-        double segundoNumero = Double.parseDouble(display.getText());
-        double resultado = 0.0;
-
-        switch (operador) {
-            case "+":
-                resultado = primerNumero + segundoNumero;
-                break;
-            case "-":
-                resultado = primerNumero - segundoNumero;
-                break;
-            case "*":
-                resultado = primerNumero * segundoNumero;
-                break;
-            case "/":
-                if (segundoNumero == 0) {
-                    display.setText("Error: División por cero");
-                    nuevoInput = true;
-                    return;
-                }
-                resultado = primerNumero / segundoNumero;
-                break;
-            case "%":
-                resultado = primerNumero % segundoNumero;
-                break;
-            case "xʸ":
-                //resultado = Math.pow(primerNumero, segundoNumero);
-                //break;
-                Exponencial expo = new Exponencial (); 
-                resultado = expo.Expocinencial(primerNumero, segundoNumero);
-                break;
-
-            case "x√y":
-                resultado = Math.pow(primerNumero, 1.0 / segundoNumero);
-                break;
-        }
+            double segundoNumero = Double.parseDouble(display.getText());
+            double resultado = 0.0;
 
             switch (operador) {
                 case "+":
@@ -483,7 +450,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     resultado = primerNumero % segundoNumero;
                     break;
                 case "xʸ":
-                    resultado = Math.pow(primerNumero, segundoNumero);
+                    Exponencial expo = new Exponencial(); 
+                    resultado = expo.Expocinencial(primerNumero, segundoNumero);
                     break;
                 case "x√y":
                     resultado = Math.pow(segundoNumero, 1.0 / primerNumero);
