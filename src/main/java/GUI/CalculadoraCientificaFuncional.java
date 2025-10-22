@@ -376,6 +376,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText("0");
                     nuevoInput = true;
                     break;
+                //boton borrar entrada
                 case "CE":
                     String nuevo = Modelo.BotonCE.clearEntry(display.getText());
                     display.setText(nuevo);
