@@ -350,9 +350,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText("0");
                     nuevoInput = true;
                     break;
-                //se solucionó un problema que había con el del
+                //se solucionó un problema que había con el DEL "<-"
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
+                    break;
 
                 // --- Funciones hiperbólicas ---
                 case "sinh":
