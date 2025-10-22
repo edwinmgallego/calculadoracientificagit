@@ -9,21 +9,11 @@ package Modelo;
  * @author 9spot
  */
 public class BotonCE {
-    public static String limpiarEntradaActual(String textoActual) {
-        if (textoActual == null || textoActual.isEmpty() || textoActual.equals("0")) {
-            return "0";
-        }
-
-        String nuevo = textoActual.substring(0, textoActual.length() - 1);
-
-        if (nuevo.isEmpty() || nuevo.equals("-") || nuevo.equals(".") || nuevo.equals("-.")) {
-            return "0";
-        }
-
-        return nuevo;
+    public static String clearEntry(String textoActual) {
+        return "0";
     }
 
-    public static boolean necesitaLimpiar(String textoActual) {
+    public static boolean needsClear(String textoActual) {
         return textoActual != null && !textoActual.equals("0") && !textoActual.isEmpty();
     }
 }

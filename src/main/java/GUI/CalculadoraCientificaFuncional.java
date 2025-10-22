@@ -84,19 +84,14 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 // --- Etiquetas de los botones según las funciones solicitadas ---
         String[] botones = {
             // Fila 1 - Trigonométricas
-            "sin", "cos", "tan", "asin", "acos", "atan",
-            // Fila 2 - Hiperbólicas
-            "sinh", "cosh", "tanh", "ln", "log", "eˣ",
-            // Fila 3 - Potencias y raíces
-            "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
-            // Fila 4 - Factorial, porcentaje y clear
-            "n!", "%", "C", "CE","<-" , "±", "/",
-            // Fila 5 - Números 7 8 9
-            "7", "8", "9", "*", "(", ")",
-            // Fila 6 - Números 4 5 6
-            "4", "5", "6", "-", "=", " ",
-            // Fila 7 - Números 1 2 3 0 . =
-            "1", "2", "3", "0", "+", "."
+            "C",      "CE",     "<-",     "(",   ")",  "Hist", "NotC",   // Fila 1 - Control, paréntesis, historial, notación científica
+            "π",      "e",      "DEG",    "RAD", "GRAD","",     "",      // Fila 2 - Constantes y modo ángulo
+            "sin",    "cos",    "tan",    "asin","acos","atan", "",      // Fila 3 - Trig funciones
+            "sinh",   "cosh",   "tanh",   "ln",  "log", "prom", "",      // Fila 4 - Hiperbólicas y logaritmos
+            "e^x",    "10^x",   "x^y",    "√",   "∛",   "x√y",  "1/x",   // Fila 5 - Exponenciales, raíces y recíproco
+            "7",      "8",      "9",      "÷",   "%",   "!",    "+/-",  // Fila 6 - Números altos y operadores especiales
+            "4",      "5",      "6",      "×",   "-",   "",     "",      // Fila 7 - Números medios y operador multiplicar y restar
+            "1",      "2",      "3",      "+",   "=",   ".",    "0" 
         };
 
         for (String textoBoton : botones) {
@@ -353,9 +348,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText("0");
                     break;
                 case "CE":
-                    display.setText("0");
+                    String nuevo = Modelo.BotonCE.clearEntry(display.getText());
+                    display.setText(nuevo);
                     nuevoInput = true;
                     break;
+
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
                     break;
