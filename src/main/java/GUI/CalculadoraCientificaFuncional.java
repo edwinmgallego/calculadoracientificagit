@@ -93,9 +93,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             // Fila 5 - Números 7 8 9
             "7", "8", "9", "*", "(", ")",
             // Fila 6 - Números 4 5 6
-            "4", "5", "6", "-", " ", " ",
+            "4", "5", "6", "-", "=", " ",
             // Fila 7 - Números 1 2 3 0 . =
-            "1", "2", "3", "+", "0", "."
+            "1", "2", "3", "0", "+", "."
         };
 
         for (String textoBoton : botones) {
@@ -105,6 +105,8 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
             if (textoBoton.equals("=")) {
                 boton.setBackground(new Color(0, 150, 0));
+                boton.setForeground(Color.BLACK);
+            } else if (textoBoton.matches("C|CE")) {
                 boton.setForeground(Color.BLACK);
             } else if (textoBoton.matches("[C]|CE")) {
                 boton.setBackground(new Color(200, 50, 50));
@@ -305,8 +307,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
                 }
                 case "tan": {
-                    
-                    double in = Double.parseDouble(textoDisplay);
+                     double in = Double.parseDouble(textoDisplay);
                     FuncionTangente tan = new FuncionTangente(in);
                     double res = tan.calcularTangente();
                     display.setText(formatNumber(res));
