@@ -29,6 +29,8 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import Modelo.*;
 
+import Modelo.RaizCubica;
+
 /**
  * Clase que crea la interfaz y la funcionalidad de una calculadora científica.
  */
@@ -84,18 +86,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         String[] botones = {
             // Fila 1 - Trigonométricas
             "sin", "cos", "tan", "asin", "acos", "atan",
-            // Fila 2 - Hiperbólicas
-            "sinh", "cosh", "tanh", "ln", "log", "eˣ",
-            // Fila 3 - Potencias y raíces
-            "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
-            // Fila 4 - Factorial, porcentaje y clear
-            "n!", "%", "C", "CE", "<-", "±", "/",
-            // Fila 5 - Números 7 8 9
-            "7", "8", "9", "*", "(", ")",
-            // Fila 6 - Números 4 5 6
-            "4", "5", "6", "-", "=", " ",
-            // Fila 7 - Números 1 2 3 0 . =
-            "1", "2", "3", "0", "+", "."
+            "xʸ", "√", "3√x", "x√y", "ln", "log",
+            "eˣ", "10ˣ", "1/x", "n!", "%", "C",
+            "7", "8", "9", "/", "CE", "±",
+            "4", "5", "6", "*", "1", "2",
+            "3", "-", "0", ".", "=", "+"
         };
 
         for (String textoBoton : botones) {
@@ -232,13 +227,11 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     addToHistory("√(" + formatNumber(in) + ") = " + formatNumber(res));
                     nuevoInput = true;
                     break;
-                }
-                case "∛": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.cbrt(in);
-                    display.setText(formatNumber(res));
-                    addToHistory("∛(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                case "3√x":
+                     RaizCubica rc = new RaizCubica();
+                     primerNumero = Double.parseDouble(textoDisplay);
+                     rc.setPrimerNumero(Double.parseDouble(textoDisplay));
+                     display.setText(String.valueOf(rc.raizCubica()));
                     break;
                 }
                 case "x²": {
