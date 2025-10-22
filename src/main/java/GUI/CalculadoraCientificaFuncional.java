@@ -38,6 +38,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private JTextField display;
 
     // Variables para almacenar los operandos y la operación
+    // Variables para almacenar los operandos y la operación
     private double primerNumero;
     private String operador;
     private boolean nuevoInput; // Para controlar si se debe limpiar la pantalla
