@@ -22,6 +22,6 @@ public class RaizCubica {
     
     public double raizCubica(){
     
-    return Math.sqrt(primerNumero);
+    return Math.cbrt(primerNumero);
     }
 }
