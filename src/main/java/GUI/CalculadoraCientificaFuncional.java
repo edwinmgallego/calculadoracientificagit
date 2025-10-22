@@ -377,9 +377,9 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 case "CE":
-                    textoDisplay = BotonCE.limpiarEntradaActual(textoDisplay);
-                    display.setText(textoDisplay);
-                    nuevoInput = textoDisplay.equals("0");
+                    String nuevo = Modelo.BotonCE.clearEntry(display.getText());
+                    display.setText(nuevo);
+                    nuevoInput = true;
                     break;
                     
                 case "<-":
