@@ -77,25 +77,19 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         northPanel.add(btnHist, BorderLayout.EAST);
         panelPrincipal.add(northPanel, BorderLayout.NORTH);
 
-// --- Panel de Botones ---
+        // --- Panel de Botones ---
         JPanel panelBotones = new JPanel(new GridLayout(7, 6, 5, 5));
 
-// --- Etiquetas de los botones según las funciones solicitadas ---
+        // --- Etiquetas de los botones según las funciones solicitadas ---
         String[] botones = {
             // Fila 1 - Trigonométricas
             "sin", "cos", "tan", "asin", "acos", "atan",
-            // Fila 2 - Hiperbólicas
-            "sinh", "cosh", "tanh", "ln", "log", "eˣ",
-            // Fila 3 - Potencias y raíces
-            "xʸ", "√", "∛", "x√y", "10ˣ", "1/x",
-            // Fila 4 - Factorial, porcentaje y clear
-            "n!", "%", "C", "CE","<-" , "±", "/",
-            // Fila 5 - Números 7 8 9
-            "7", "8", "9", "*", "(", ")",
-            // Fila 6 - Números 4 5 6
-            "4", "5", "6", "-", "=", " ",
-            // Fila 7 - Números 1 2 3 0 . =
-            "1", "2", "3", "0", "+", "."
+            "xʸ", "√", "3√x", "x√y", "ln", "log",
+            "eˣ", "10ˣ", "1/x", "n!", "%", "C",
+            "7", "8", "9", "/", "CE", "±",
+            "4", "5", "6", "*", "(", ")",
+            "1", "2", "3", "-", "0", ".",
+            "=", "+"
         };
 
         for (String textoBoton : botones) {
@@ -105,15 +99,14 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
             if (textoBoton.equals("=")) {
                 boton.setBackground(new Color(0, 150, 0));
-                boton.setForeground(Color.BLACK);
+                boton.setForeground(Color.WHITE);
             } else if (textoBoton.matches("C|CE")) {
-                boton.setForeground(Color.BLACK);
-            } else if (textoBoton.matches("[C]|CE")) {
                 boton.setBackground(new Color(200, 50, 50));
-                boton.setForeground(Color.BLACK);
+                boton.setForeground(Color.WHITE);
             } else if (textoBoton.matches("[\\+\\-*%/]")) {
                 boton.setBackground(new Color(240, 240, 240));
             }
+            
             panelBotones.add(boton);
         }
 
@@ -184,9 +177,16 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     break;
 
                 // --- Operadores Binarios (+, -, *, /, %, x^y, x√y) ---
-                case "+": case "-": case "*": case "/": case "%":
-                case "xʸ": case "x√y":
-                    calcular(); // resuelve operación pendiente antes de cambiar el operador
+                case "+":
+                case "-":
+                case "*":
+                case "/":
+                case "%":
+                case "xʸ":
+                case "x√y":
+                    if (!operador.isEmpty()) {
+                        calcular(); // resuelve operación pendiente antes de cambiar el operador
+                    }
                     operador = comando;
                     primerNumero = Double.parseDouble(display.getText());
                     nuevoInput = true;
@@ -194,8 +194,23 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
                 // --- Botón de Igual ---
                 case "=":
-                    calcular();
-                    operador = "";
+                    try {
+                        String expr = display.getText();
+                        // Si la expresión contiene paréntesis, usar Parentesis
+                        if (expr.contains("(") || expr.contains(")")) {
+                            double resultado = Parentesis.evaluar(expr);
+                            display.setText(formatNumber(resultado));
+                            addToHistory(expr + " = " + formatNumber(resultado));
+                            operador = "";
+                            nuevoInput = true;
+                        } else if (!operador.isEmpty()) {
+                            calcular();
+                        }
+                    } catch (Exception exPar) {
+                        display.setText("Error: " + exPar.getMessage());
+                        operador = "";
+                        nuevoInput = true;
+                    }
                     break;
 
                 // --- Operadores Unarios (operan sobre el número actual) ---
@@ -207,19 +222,13 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 }
-                case "∛": {
+                case "3√x": {
+                    RaizCubica rc = new RaizCubica();
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.cbrt(in);
+                    rc.setPrimerNumero(in);
+                    double res = rc.raizCubica();
                     display.setText(formatNumber(res));
-                    addToHistory("∛(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
-                    break;
-                }
-                case "x²": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = in * in;
-                    display.setText(formatNumber(res));
-                    addToHistory(formatNumber(in) + "² = " + formatNumber(res));
+                    addToHistory("³√(" + formatNumber(in) + ") = " + formatNumber(res));
                     nuevoInput = true;
                     break;
                 }
@@ -240,7 +249,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     double in = Double.parseDouble(textoDisplay);
                     double res = -in;
                     display.setText(formatNumber(res));
-                    addToHistory("±(" + formatNumber(in) + ") = " + formatNumber(res));
+                    nuevoInput = false;
                     break;
                 }
                 case "n!": {
@@ -317,28 +326,49 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 case "asin": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.toDegrees(Math.asin(in));
-                    display.setText(formatNumber(res));
-                    addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    if (in < -1 || in > 1) {
+                        display.setText("MathERROR");
+                    } else {
+                        double res = Math.toDegrees(Math.asin(in));
+                        display.setText(formatNumber(res));
+                        addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    }
                     nuevoInput = true;
                     break;
                 }
                 case "acos": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.toDegrees(Math.acos(in));
-                    display.setText(formatNumber(res));
-                    addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    ArcoCoseno arcocoseno = new ArcoCoseno();
+                    if (in < -1 || in > 1) {
+                        display.setText("MathERROR");
+                    } else {
+                        double res = arcocoseno.calcularArcoCoseno(in);
+                        display.setText(formatNumber(res));
+                        addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    }
                     nuevoInput = true;
                     break;
                 }
                 case "atan": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.toDegrees(Math.atan(in));
+                    Arcotangente arcotangente = new Arcotangente();
+                    double res = Math.toDegrees(arcotangente.calcularArcotangente(in));
                     display.setText(formatNumber(res));
                     addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
                     nuevoInput = true;
                     break;
                 }
+
+                // --- Paréntesis ---
+                case "(":
+                case ")":
+                    if (nuevoInput) {
+                        display.setText(comando);
+                        nuevoInput = false;
+                    } else {
+                        display.setText(textoDisplay + comando);
+                    }
+                    break;
 
                 // --- Control ---
                 case "C":
@@ -348,32 +378,42 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 case "CE":
-                    display.setText("0");
-                    nuevoInput = true;
+                    textoDisplay = BotonCE.limpiarEntradaActual(textoDisplay);
+                    display.setText(textoDisplay);
+                    nuevoInput = textoDisplay.equals("0");
                     break;
                 case "<-":
                     display.setText(RetrocesUltimoDigito.borrarUltimoCaracter(textoDisplay));
                     break;
 
                 // --- Funciones hiperbólicas ---
-                case "sinh":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    FuncHiperb f1 = new FuncHiperb(primerNumero, 1);
+                case "sinh": {
+                    double in = Double.parseDouble(textoDisplay);
+                    FuncHiperb f1 = new FuncHiperb(in, 1);
                     display.setText(String.valueOf(f1.getOutput()));
+                    nuevoInput = true;
                     break;
-                case "cosh":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    FuncHiperb f2 = new FuncHiperb(primerNumero, 2);
+                }
+                case "cosh": {
+                    double in = Double.parseDouble(textoDisplay);
+                    FuncHiperb f2 = new FuncHiperb(in, 2);
                     display.setText(String.valueOf(f2.getOutput()));
+                    nuevoInput = true;
                     break;
-                case "tanh":
-                    primerNumero = Double.parseDouble(textoDisplay);
-                    FuncHiperb f3 = new FuncHiperb(primerNumero, 3);
+                }
+                case "tanh": {
+                    double in = Double.parseDouble(textoDisplay);
+                    FuncHiperb f3 = new FuncHiperb(in, 3);
                     display.setText(String.valueOf(f3.getOutput()));
+                    nuevoInput = true;
                     break;
+                }
             }
         } catch (NumberFormatException ex) {
-            display.setText("Error de sintaxis");
+            display.setText("Error: Entrada inválida");
+            nuevoInput = true;
+        } catch (Exception ex) {
+            display.setText("Error: " + ex.getMessage());
             nuevoInput = true;
         }
     }
@@ -417,15 +457,52 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 break;
         }
 
-        // Guardar en historial (antes de cambiar primerNumero)
-        String entradaHistorial = formatNumber(primerNumero) + " " + operador + " " + formatNumber(segundoNumero) + " = " + formatNumber(resultado);
-        addToHistory(entradaHistorial);
+            switch (operador) {
+                case "+":
+                    resultado = primerNumero + segundoNumero;
+                    break;
+                case "-":
+                    resultado = primerNumero - segundoNumero;
+                    break;
+                case "*":
+                    resultado = primerNumero * segundoNumero;
+                    break;
+                case "/":
+                    if (segundoNumero == 0) {
+                        display.setText("Error: División por cero");
+                        nuevoInput = true;
+                        operador = "";
+                        return;
+                    }
+                    resultado = primerNumero / segundoNumero;
+                    break;
+                case "%":
+                    resultado = primerNumero % segundoNumero;
+                    break;
+                case "xʸ":
+                    resultado = Math.pow(primerNumero, segundoNumero);
+                    break;
+                case "x√y":
+                    resultado = Math.pow(segundoNumero, 1.0 / primerNumero);
+                    break;
+            }
 
-        // Formateamos para no mostrar ".0" en números enteros
-        display.setText(formatNumber(resultado));
+            // Guardar en historial
+            String entradaHistorial = formatNumber(primerNumero) + " " + operador + " " 
+                                    + formatNumber(segundoNumero) + " = " + formatNumber(resultado);
+            addToHistory(entradaHistorial);
 
-        primerNumero = resultado; // Permite encadenar operaciones
-        nuevoInput = true;
+            // Formateamos para no mostrar ".0" en números enteros
+            display.setText(formatNumber(resultado));
+
+            primerNumero = resultado; // Permite encadenar operaciones
+            operador = "";
+            nuevoInput = true;
+        } catch (Exception ex) {
+            display.setText("Error");
+            operador = "";
+            nuevoInput = true;
+        }
     }
 
     private long factorial(int n) {
