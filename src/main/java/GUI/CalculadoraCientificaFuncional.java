@@ -142,6 +142,10 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     display.setText(String.valueOf(Math.cbrt(primerNumero)));
                     break;
                 case "x²": // Este no estaba en la lista pero es común, lo añado como ejemplo1
+                    
+                    
+                    
+                    //nueevo commit
                     primerNumero = Double.parseDouble(textoDisplay);
                     display.setText(String.valueOf(primerNumero * primerNumero));
                     break;

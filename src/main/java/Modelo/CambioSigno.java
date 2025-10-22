@@ -13,6 +13,13 @@ public class CambioSigno {
     private double numeroActual;
     private double resultado;
     
+    
+    
+    
+    
+    
+    
+    
 
     public CambioSigno() {
         this.numeroActual = 0.0;
