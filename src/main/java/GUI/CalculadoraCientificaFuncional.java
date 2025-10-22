@@ -359,7 +359,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     nuevoInput = true;
                     break;
                 }
-
+// --- Paréntesis ---
                 // --- Paréntesis ---
                 case "(":
                 case ")":
