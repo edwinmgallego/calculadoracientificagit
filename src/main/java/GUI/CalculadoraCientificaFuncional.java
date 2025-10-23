@@ -76,7 +76,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         });
         northPanel.add(btnHist, BorderLayout.EAST);
         panelPrincipal.add(northPanel, BorderLayout.NORTH);
-
+  //  --- Panel de Botones ---
         // --- Panel de Botones ---
         JPanel panelBotones = new JPanel(new GridLayout(7, 6, 5, 5));
 
