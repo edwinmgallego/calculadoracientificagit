@@ -79,7 +79,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
   //  --- Panel de Botones ---
         // --- Panel de Botones ---
         JPanel panelBotones = new JPanel(new GridLayout(7, 6, 5, 5));
-
+      // --- Etiquetas de los botones según las funciones solicitadas ---
         // --- Etiquetas de los botones según las funciones solicitadas ---
         String[] botones = {
             // Fila 1 - Trigonométricas
