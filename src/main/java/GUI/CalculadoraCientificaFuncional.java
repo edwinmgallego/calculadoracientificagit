@@ -45,12 +45,15 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private DefaultListModel<String> historyModel;
     private JList<String> historyList;
     private JDialog dialogHistorial;
+    private String angleMode;
     private JButton btnHist;
     private static final int HISTORY_LIMIT = 100;
 
     public CalculadoraCientificaFuncional() {
         // --- Configuración de la Ventana (JFrame) ---
         setTitle("Calculadora Científica Funcional");
+        angleMode = "DEG"; // <--- AÑADE ESTA LÍNEA
+        setTitle("Calculadora Científica [" + angleMode + "]");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 700);
         setLocationRelativeTo(null);
@@ -89,7 +92,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             "7", "8", "9", "/", "CE", "±",
             "4", "5", "6", "*", "(", ")",
             "1", "2", "3", "-", "0", ".",
-            "=", "+","<-",
+            "=", "+","<-","DRG"
         };
 
         for (String textoBoton : botones) {
@@ -302,26 +305,36 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 // --- Trigonométricas (usamos entrada en grados por usabilidad) ---
                 case "sin": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Seno.calcularSeno(in);
+                    
+                    // Convertimos la entrada (DEG/RAD/GRAD) a radianes
+                    double inRadians = toRadians(in); 
+                    double res = Math.sin(inRadians); // Usamos Math.sin
+                    
                     display.setText(formatNumber(res));
-                    addToHistory("sin(" + formatNumber(in) + "°) = " + formatNumber(res));
+                    // Añadimos el modo al historial
+                    addToHistory("sin(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
                     nuevoInput = true;
                     break;
                 }
                 case "cos": {
                     double in = Double.parseDouble(textoDisplay);
-                    double res = Math.cos(Math.toRadians(in));
+                    
+                    double inRadians = toRadians(in); // Convertimos
+                    double res = Math.cos(inRadians); // Usamos Math.cos
+                    
                     display.setText(formatNumber(res));
-                    addToHistory("cos(" + formatNumber(in) + "°) = " + formatNumber(res));
+                    addToHistory("cos(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
                     nuevoInput = true;
                     break;
                 }
                 case "tan": {
                     double in = Double.parseDouble(textoDisplay);
-                    FuncionTangente tan = new FuncionTangente(in);
-                    double res = tan.calcularTangente();
+                    
+                    double inRadians = toRadians(in); // Convertimos
+                    double res = Math.tan(inRadians); // Usamos Math.tan
+                    
                     display.setText(formatNumber(res));
-                    addToHistory("tan(" + formatNumber(in) + "°) = " + formatNumber(res));
+                    addToHistory("tan(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
                     nuevoInput = true;
                     break;
                 }
@@ -330,46 +343,50 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                     if (in < -1 || in > 1) {
                         display.setText("MathERROR");
                     } else {
-                        double res = Math.toDegrees(Math.asin(in));
+                        double resRadians = Math.asin(in);
+                        double res = fromRadians(resRadians); 
+                        
                         display.setText(formatNumber(res));
-                        addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                        addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
                     }
                     nuevoInput = true;
                     break;
                 }
                 case "acos": {
                     double in = Double.parseDouble(textoDisplay);
-                    ArcoCoseno arcocoseno = new ArcoCoseno();
                     if (in < -1 || in > 1) {
                         display.setText("MathERROR");
                     } else {
-                        double res = arcocoseno.calcularArcoCoseno(in);
+                        double resRadians = Math.acos(in);
+                        double res = fromRadians(resRadians); 
+                        
                         display.setText(formatNumber(res));
-                        addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                        addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
                     }
                     nuevoInput = true;
                     break;
                 }
                 case "atan": {
                     double in = Double.parseDouble(textoDisplay);
-                    Arcotangente arcotangente = new Arcotangente();
-                    double res = Math.toDegrees(arcotangente.calcularArcotangente(in));
+                    
+                    double resRadians = Math.atan(in); 
+                    double res = fromRadians(resRadians); 
+                    
                     display.setText(formatNumber(res));
-                    addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
+                    addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
                     nuevoInput = true;
                     break;
                 }
-                // --- Paréntesis ---
-                case "(":
-                case ")":
-                    if (nuevoInput) {
-                        display.setText(comando);
-                        nuevoInput = false;
-                    } else {
-                        display.setText(textoDisplay + comando);
+                case "DRG":
+                    if (angleMode.equals("DEG")) {
+                        angleMode = "RAD";
+                    } else if (angleMode.equals("RAD")) {
+                        angleMode = "GRAD";
+                    } else { // Era "GRAD"
+                        angleMode = "DEG";
                     }
+                    setTitle("Calculadora Científica [" + angleMode + "]");
                     break;
-
                 // --- Control ---
                 case "C":
                     primerNumero = 0;
@@ -486,7 +503,26 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
         }
         return fact;
     }
+private double toRadians(double angle) {
+        if (angleMode.equals("DEG")) {
+            return Math.toRadians(angle);
+        } else if (angleMode.equals("GRAD")) {
+            return angle * (Math.PI / 200.0);
+        }
+        // Si es "RAD", ya está en radianes
+        return angle;
+    }
 
+    private double fromRadians(double radians) {
+        if (angleMode.equals("DEG")) {
+            return Math.toDegrees(radians);
+        } else if (angleMode.equals("GRAD")) {
+            return radians * (200.0 / Math.PI);
+        }
+        // Si es "RAD", se queda en radianes
+        return radians;
+    }
+    
     private void addToHistory(String entry) {
         if (historyModel == null) return;
         if (historyModel.getSize() >= HISTORY_LIMIT) {
