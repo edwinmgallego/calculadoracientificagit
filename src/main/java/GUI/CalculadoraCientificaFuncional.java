@@ -367,13 +367,14 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                         nuevoInput = true;
                     } else {
                         double in = Double.parseDouble(textoDisplay);
-                        double res = Math.pow(10, in);
+                        // Puedes usar directamente Math.pow o tu clase
+                        double res = PotenciaBase10.calcularPotencia(in);
                         display.setText(formatNumber(res));
                         addToHistory("10^(" + formatNumber(in) + ") = " + formatNumber(res));
                         nuevoInput = true;
                     }
                     break;
-                }
+}
 
                 case "sin": {
                     if (modoExpresion) {
