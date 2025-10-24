@@ -45,12 +45,17 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private DefaultListModel<String> historyModel;
     private JList<String> historyList;
     private JDialog dialogHistorial;
+    private String angleMode;
     private JButton btnHist;
     private static final int HISTORY_LIMIT = 100;
 
     public CalculadoraCientificaFuncional() {
         // --- Configuración de la Ventana (JFrame) ---
         setTitle("Calculadora Científica Funcional");
+        
+        angleMode = "DEG"; // <--- AÑADE ESTA LÍNEA
+        setTitle("Calculadora Científica [" + angleMode + "]");
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 700);
         setLocationRelativeTo(null);
@@ -89,7 +94,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
             "7", "8", "9", "/", "CE", "±",
             "4", "5", "6", "*", "(", ")",
             "1", "2", "3", "-", "0", ".",
-            "=", "+","<-",
+            "=", "+","<-","DRG"
         };
 
         for (String textoBoton : botones) {
