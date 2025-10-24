@@ -419,15 +419,16 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
                 
                 case "asin": {
-                    if (modoExpresion) {
+                   if (modoExpresion) {
                         display.setText("Error: Use primero '='");
                         nuevoInput = true;
                     } else {
                         double in = Double.parseDouble(textoDisplay);
+                        ArcoSeno arcoseno = new ArcoSeno(); // Cambiar esta línea
                         if (in < -1 || in > 1) {
                             display.setText("MathERROR");
                         } else {
-                            double res = Math.toDegrees(Math.asin(in));
+                            double res = arcoseno.calcularArcoSeno(in); // Y esta
                             display.setText(formatNumber(res));
                             addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + "°");
                         }
