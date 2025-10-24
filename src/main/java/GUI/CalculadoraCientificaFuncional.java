@@ -167,38 +167,72 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     public void actionPerformed(ActionEvent e) {
         String comando = e.getActionCommand();
         String textoDisplay = display.getText();
+        
+        // Verificar si estamos en modo expresión (con paréntesis)
+        boolean modoExpresion = textoDisplay.contains("(") || textoDisplay.contains(")");
 
         try {
             switch (comando) {
                 // --- Números ---
                 case "0": case "1": case "2": case "3": case "4":
                 case "5": case "6": case "7": case "8": case "9":
-                    if (nuevoInput) {
-                        display.setText(comando);
+                    if (modoExpresion) {
+                        // Modo expresión: agregar número
+                        display.setText(textoDisplay + comando);
                         nuevoInput = false;
                     } else {
-                        display.setText(textoDisplay + comando);
+                        // Modo tradicional
+                        if (nuevoInput) {
+                            display.setText(comando);
+                            nuevoInput = false;
+                        } else {
+                            display.setText(textoDisplay + comando);
+                        }
                     }
                     break;
 
                 case ".":
-                    if (nuevoInput) {
-                        display.setText("0.");
-                        nuevoInput = false;
-                    } else if (!textoDisplay.contains(".")) {
+                    if (modoExpresion) {
                         display.setText(textoDisplay + ".");
+                    } else {
+                        if (nuevoInput) {
+                            display.setText("0.");
+                            nuevoInput = false;
+                        } else if (!textoDisplay.contains(".")) {
+                            display.setText(textoDisplay + ".");
+                        }
                     }
                     break;
 
                 // --- Operadores Binarios (+, -, *, /, %, x^y, x√y) ---
-                case "+": case "-": case "*": case "/": case "%":
-                case "xʸ": case "x√y":
-                    if (!operador.isEmpty()) {
-                        calcular(); // resuelve operación pendiente antes de cambiar el operador
+                case "+": case "-": case "*": case "/":
+                    if (modoExpresion) {
+                        // En modo expresión, solo agregar el operador
+                        display.setText(textoDisplay + comando);
+                        nuevoInput = false;
+                    } else {
+                        // Modo tradicional
+                        if (!operador.isEmpty()) {
+                            calcular();
+                        }
+                        operador = comando;
+                        primerNumero = Double.parseDouble(display.getText());
+                        nuevoInput = true;
                     }
-                    operador = comando;
-                    primerNumero = Double.parseDouble(display.getText());
-                    nuevoInput = true;
+                    break;
+                
+                case "%": case "xʸ": case "x√y":
+                    if (modoExpresion) {
+                        display.setText("Error: Operador no válido con paréntesis");
+                        nuevoInput = true;
+                    } else {
+                        if (!operador.isEmpty()) {
+                            calcular();
+                        }
+                        operador = comando;
+                        primerNumero = Double.parseDouble(display.getText());
+                        nuevoInput = true;
+                    }
                     break;
 
                 // --- Botón de Igual ---
@@ -211,12 +245,23 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                             display.setText(formatNumber(resultado));
                             addToHistory(expr + " = " + formatNumber(resultado));
                             operador = "";
+                            primerNumero = 0;
                             nuevoInput = true;
                         } else if (!operador.isEmpty()) {
                             calcular();
+                        } else {
+                            nuevoInput = true;
                         }
-                    } catch (Exception exPar) {
-                        display.setText("Error: " + exPar.getMessage());
+                    } catch (ArithmeticException exArit) {
+                        display.setText("Error: " + exArit.getMessage());
+                        operador = "";
+                        nuevoInput = true;
+                    } catch (IllegalArgumentException exArg) {
+                        display.setText("Error: " + exArg.getMessage());
+                        operador = "";
+                        nuevoInput = true;
+                    } catch (Exception exGen) {
+                        display.setText("Error de sintaxis");
                         operador = "";
                         nuevoInput = true;
                     }
@@ -224,186 +269,252 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
                 // --- Operadores Unarios (operan sobre el número actual) ---
                 case "√": {
-                    double in = Double.parseDouble(textoDisplay);
-                    RaizCuadrada raizCuad = new RaizCuadrada();
-                    raizCuad.setPrimerNumero(in);
-                    double res = raizCuad.raiz(in);
-                    display.setText(formatNumber(res));
-                    addToHistory("√(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        RaizCuadrada raizCuad = new RaizCuadrada();
+                        raizCuad.setPrimerNumero(in);
+                        double res = raizCuad.raiz(in);
+                        display.setText(formatNumber(res));
+                        addToHistory("√(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "3√x": {
-                    RaizCubica rc = new RaizCubica();
-                    double in = Double.parseDouble(textoDisplay);
-                    rc.setPrimerNumero(in);
-                    double res = rc.raizCubica();
-                    display.setText(formatNumber(res));
-                    addToHistory("³√(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        RaizCubica rc = new RaizCubica();
+                        double in = Double.parseDouble(textoDisplay);
+                        rc.setPrimerNumero(in);
+                        double res = rc.raizCubica();
+                        display.setText(formatNumber(res));
+                        addToHistory("³√(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "1/x": {
-                    double in = Double.parseDouble(textoDisplay);
-                    if (in == 0) {
-                        display.setText("Error: División por cero");
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
                         nuevoInput = true;
                     } else {
-                        double res = 1.0 / in;
-                        display.setText(formatNumber(res));
-                        addToHistory("1/(" + formatNumber(in) + ") = " + formatNumber(res));
-                        nuevoInput = true;
+                        double in = Double.parseDouble(textoDisplay);
+                        if (in == 0) {
+                            display.setText("Error: División por cero");
+                            nuevoInput = true;
+                        } else {
+                            double res = 1.0 / in;
+                            display.setText(formatNumber(res));
+                            addToHistory("1/(" + formatNumber(in) + ") = " + formatNumber(res));
+                            nuevoInput = true;
+                        }
                     }
                     break;
                 }
 
                 case "±": {
-                    double in = Double.parseDouble(textoDisplay);
-                    CambioSigno operacion = new CambioSigno(in);
-                    double res = operacion.calcularCambioSigno();
-                    display.setText(formatNumber(res));
-                    nuevoInput = false;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        CambioSigno operacion = new CambioSigno(in);
+                        double res = operacion.calcularCambioSigno();
+                        display.setText(formatNumber(res));
+                        nuevoInput = false;
+                    }
                     break;
                 }
 
                 case "n!": {
-                    double in = Double.parseDouble(textoDisplay);
-                    if (in >= 0 && in == (int) in && in <= 20) {
-                        long fact = Factorial.factorial((int) in);
-                        display.setText(String.valueOf(fact));
-                        addToHistory((int) in + "! = " + fact);
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
                     } else {
-                        display.setText("Error: n! solo para enteros >= 0 (<=20)");
+                        double in = Double.parseDouble(textoDisplay);
+                        if (in >= 0 && in == (int) in && in <= 20) {
+                            long fact = Factorial.factorial((int) in);
+                            display.setText(String.valueOf(fact));
+                            addToHistory((int) in + "! = " + fact);
+                        } else {
+                            display.setText("Error: n! solo para enteros >= 0 (<=20)");
+                        }
+                        nuevoInput = true;
                     }
-                    nuevoInput = true;
                     break;
                 }
 
                 // --- Logaritmos y Exponenciales ---
                 case "ln": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.log(in);
-                    display.setText(formatNumber(res));
-                    addToHistory("ln(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double res = Math.log(in);
+                        display.setText(formatNumber(res));
+                        addToHistory("ln(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "log": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.log10(in);
-                    display.setText(formatNumber(res));
-                    addToHistory("log(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double res = Math.log10(in);
+                        display.setText(formatNumber(res));
+                        addToHistory("log(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "eˣ": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.exp(in);
-                    display.setText(formatNumber(res));
-                    addToHistory("e^(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double res = Math.exp(in);
+                        display.setText(formatNumber(res));
+                        addToHistory("e^(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "10ˣ": {
-                    double in = Double.parseDouble(textoDisplay);
-                    double res = Math.pow(10, in);
-                    display.setText(formatNumber(res));
-                    addToHistory("10^(" + formatNumber(in) + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double res = Math.pow(10, in);
+                        display.setText(formatNumber(res));
+                        addToHistory("10^(" + formatNumber(in) + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 // --- Trigonométricas CON SOPORTE DRG ---
                 case "sin": {
-                    double in = Double.parseDouble(textoDisplay);
-                    // Convertir entrada al modo actual a grados para Seno
-                    double enGrados = convertirAGrados(in);
-                    double res = Seno.calcularSeno(enGrados);
-                    display.setText(formatNumber(res));
-                    addToHistory("sin(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double enGrados = convertirAGrados(in);
+                        double res = Seno.calcularSeno(enGrados);
+                        display.setText(formatNumber(res));
+                        addToHistory("sin(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "cos": {
-                    double in = Double.parseDouble(textoDisplay);
-                    // Convertir entrada al modo actual a radianes
-                    double radianes = toRadians(in);
-                    double res = Math.cos(radianes);
-                    display.setText(formatNumber(res));
-                    addToHistory("cos(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double radianes = toRadians(in);
+                        double res = Math.cos(radianes);
+                        display.setText(formatNumber(res));
+                        addToHistory("cos(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "tan": {
-                    double in = Double.parseDouble(textoDisplay);
-                    // Convertir entrada al modo actual a grados para FuncionTangente
-                    double enGrados = convertirAGrados(in);
-                    FuncionTangente tan = new FuncionTangente(enGrados);
-                    double res = tan.calcularTangente();
-                    display.setText(formatNumber(res));
-                    addToHistory("tan(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        double enGrados = convertirAGrados(in);
+                        FuncionTangente tan = new FuncionTangente(enGrados);
+                        double res = tan.calcularTangente();
+                        display.setText(formatNumber(res));
+                        addToHistory("tan(" + formatNumber(in) + angleMode + ") = " + formatNumber(res));
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 case "asin": {
-                    double in = Double.parseDouble(textoDisplay);
-                    if (in < -1 || in > 1) {
-                        display.setText("MathERROR");
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
                     } else {
-                        // Math.asin devuelve radianes, convertir a grados
-                        double radianes = Math.asin(in);
-                        double enGrados = Math.toDegrees(radianes);
-                        // Convertir grados al modo actual
-                        double res = convertirDesdeGrados(enGrados);
-                        display.setText(formatNumber(res));
-                        addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
+                        double in = Double.parseDouble(textoDisplay);
+                        if (in < -1 || in > 1) {
+                            display.setText("MathERROR");
+                        } else {
+                            double radianes = Math.asin(in);
+                            double enGrados = Math.toDegrees(radianes);
+                            double res = convertirDesdeGrados(enGrados);
+                            display.setText(formatNumber(res));
+                            addToHistory("asin(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
+                        }
+                        nuevoInput = true;
                     }
-                    nuevoInput = true;
                     break;
                 }
 
                 case "acos": {
-                    double in = Double.parseDouble(textoDisplay);
-                    ArcoCoseno arcocoseno = new ArcoCoseno();
-                    if (in < -1 || in > 1) {
-                        display.setText("MathERROR");
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
                     } else {
-                        // calcularArcoCoseno devuelve grados
-                        double enGrados = arcocoseno.calcularArcoCoseno(in);
-                        // Convertir grados al modo actual
-                        double res = convertirDesdeGrados(enGrados);
-                        display.setText(formatNumber(res));
-                        addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
+                        double in = Double.parseDouble(textoDisplay);
+                        ArcoCoseno arcocoseno = new ArcoCoseno();
+                        if (in < -1 || in > 1) {
+                            display.setText("MathERROR");
+                        } else {
+                            double enGrados = arcocoseno.calcularArcoCoseno(in);
+                            double res = convertirDesdeGrados(enGrados);
+                            display.setText(formatNumber(res));
+                            addToHistory("acos(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
+                        }
+                        nuevoInput = true;
                     }
-                    nuevoInput = true;
                     break;
                 }
 
                 case "atan": {
-                    double in = Double.parseDouble(textoDisplay);
-                    Arcotangente arcotangente = new Arcotangente();
-                    // calcularArcotangente devuelve radianes
-                    double radianes = arcotangente.calcularArcotangente(in);
-                    double enGrados = Math.toDegrees(radianes);
-                    // Convertir grados al modo actual
-                    double res = convertirDesdeGrados(enGrados);
-                    display.setText(formatNumber(res));
-                    addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
-                    nuevoInput = true;
+                    if (modoExpresion) {
+                        display.setText("Error: Use primero '='");
+                        nuevoInput = true;
+                    } else {
+                        double in = Double.parseDouble(textoDisplay);
+                        Arcotangente arcotangente = new Arcotangente();
+                        double radianes = arcotangente.calcularArcotangente(in);
+                        double enGrados = Math.toDegrees(radianes);
+                        double res = convertirDesdeGrados(enGrados);
+                        display.setText(formatNumber(res));
+                        addToHistory("atan(" + formatNumber(in) + ") = " + formatNumber(res) + angleMode);
+                        nuevoInput = true;
+                    }
                     break;
                 }
 
                 // --- Paréntesis ---
                 case "(": case ")":
-                    if (nuevoInput) {
+                    if (nuevoInput && comando.equals("(")) {
                         display.setText(comando);
                         nuevoInput = false;
                     } else {
@@ -480,8 +591,6 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
 
     /**
      * Convierte el ángulo de entrada al modo actual a radianes
-     * @param angle ángulo en el modo actual (DEG, RAD o GRAD)
-     * @return ángulo en radianes
      */
     private double toRadians(double angle) {
         switch (angleMode) {
@@ -496,18 +605,15 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     
     /**
      * Convierte el ángulo de entrada en cualquier modo a GRADOS
-     * (para usar con Seno y FuncionTangente que esperan grados)
-     * @param angle ángulo en el modo actual
-     * @return ángulo en grados
      */
     private double convertirAGrados(double angle) {
         switch (angleMode) {
             case "DEG":
-                return angle; // Ya está en grados
+                return angle;
             case "RAD":
-                return Math.toDegrees(angle); // Radianes a grados
+                return Math.toDegrees(angle);
             case "GRAD":
-                return angle * (9.0 / 10.0); // Gradianes a grados (400 grad = 360°)
+                return angle * (9.0 / 10.0);
             default:
                 return angle;
         }
@@ -515,18 +621,15 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     
     /**
      * Convierte GRADOS al modo actual
-     * (para las funciones inversas que devuelven grados)
-     * @param grados ángulo en grados
-     * @return ángulo en el modo actual
      */
     private double convertirDesdeGrados(double grados) {
         switch (angleMode) {
             case "DEG":
-                return grados; // Ya está en grados
+                return grados;
             case "RAD":
-                return Math.toRadians(grados); // Grados a radianes
+                return Math.toRadians(grados);
             case "GRAD":
-                return grados * (10.0 / 9.0); // Grados a gradianes (360° = 400 grad)
+                return grados * (10.0 / 9.0);
             default:
                 return grados;
         }
@@ -535,7 +638,7 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
     private void calcular() {
         try {
             if (operador.isEmpty() || nuevoInput) {
-                return; // No hay operación pendiente o es un input nuevo
+                return;
             }
 
             double segundoNumero = Double.parseDouble(display.getText());
@@ -598,14 +701,12 @@ public class CalculadoraCientificaFuncional extends JFrame implements ActionList
                 }
             }
 
-            // Guardar en historial
             String entradaHistorial = formatNumber(primerNumero) + " " + operador + " "
                     + formatNumber(segundoNumero) + " = " + formatNumber(resultado);
             addToHistory(entradaHistorial);
 
-            // Formateamos para no mostrar ".0" en números enteros
             display.setText(formatNumber(resultado));
-            primerNumero = resultado; // Permite encadenar operaciones
+            primerNumero = resultado;
             operador = "";
             nuevoInput = true;
 
